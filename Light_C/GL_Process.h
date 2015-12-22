@@ -16,7 +16,7 @@
 #include <cxcore.h>
 #include <windows.h>
 #include <wchar.h>
-
+#include "GLB_Math.h"
 
 using namespace cv;
 using namespace std;
@@ -39,6 +39,10 @@ int Angle_Y=0;
 
 bool Flag_X=0,Flag_Y=1;
 
+float pos_x=0,pos_y=50,pos_z=30;
+int gxr_Global=0;
+int gyr_Global=0;
+int gzr_Global=0;
 //------------------------------------------------------------------ OpenGL
 void init(void) 
 {
@@ -57,6 +61,20 @@ void glutKeyboard(unsigned char key, int x, int y)
 	case'W':eyey-=6;break;
 	case'e':eyez+=6;break;
 	case'E':eyez-=6;break;
+
+	case'x':pos_x-=1;break;
+	case'X':pos_x+=1;break;
+	case'y':pos_y-=1;break;
+	case'Y':pos_y+=1;break;
+	case'z':pos_z-=1;break;
+	case'Z':pos_z+=1;break;
+
+	case'a':gxr_Global=3;break;
+	case'A':gxr_Global=-3;break;
+	case's':gyr_Global=3;break;
+	case'S':gyr_Global=-3;break;
+	case'd':gzr_Global=3;break;
+	case'D':gzr_Global=-3;break;
 	}
 }
 
@@ -139,21 +157,9 @@ void renderCube(float size)
 	glVertex3f( 0.0f,  0.0f, size);
 	glEnd();
 }
-/************************* 叉积 *************************/
-void GL_CAJI(float a1,float a2,float a3,float b1,float b2,float b3,float &n1,float &n2,float &n3 )
-{
-	//A×B=(a2b3-a3b2)*i+(a3b1-a1b3)*j+(a1b2-a2b1)*k.
-	n1=(a2*b3-a3*b2);
-	n2=(a3*b1-a1*b3);
-	n3=(a1*b2-a2*b1);
 
-	float norm=n1*n1+n2*n2+n3*n3;
-	norm=sqrt(norm);
-	n1/=norm;
-	n2/=norm;
-	n3/=norm;
-
-}
+/**************************************************/
+//场地边长： 45*4 单位
 
 void GL_Draw_Filed()
 {
@@ -304,7 +310,7 @@ void GL_Scan()
 
 		if(flag_StepX==1)
 		{
-			Step_X2+=1.0f/50.0f*52;
+			Step_X2+=1.8f/52.0f*52;
 			y1=Step_X2;
 
 			if(Step_X2>52)
@@ -389,14 +395,14 @@ void GL_Scan()
 		glTranslatef(x2,y2,z2);
 		glRotatef(angle_GL,0,1,0);
 		glColor3f(0.0f, 1.0f, 0.0f); 
-		glutSolidSphere(6, 15, 15);
+		glutSolidSphere(3, 15, 15);
 		glPopMatrix();
 
 		glPushMatrix();
 		glTranslatef(x2,y2+52,z2);
 		glRotatef(angle_GL,0,1,0);
 		glColor3f(0.0f, 1.0f, 0.0f); 
-		glutSolidSphere(6, 15, 15);
+		glutSolidSphere(3, 15, 15);
 		glPopMatrix();
 
 		glBegin(GL_LINES);//绘制居中轨迹
@@ -422,6 +428,82 @@ void GL_Scan()
 
 
 }
+
+GL_Point GL_Quater_Point(GL_Quater Qt0,float x_offset,float y_offset,float z_offset,float r,float g,float b)
+{
+	GL_Point Pt;
+	
+	GL_Quater Qt0_N=Conjugate_Q(Qt0); //------ 根节点四元数 求逆
+
+	GL_Quater Q_Point;
+	Q_Point.q0=0;
+	Q_Point.q1=x_offset;
+	Q_Point.q2=y_offset;
+	Q_Point.q3=z_offset;//根节点骨架长度
+	//四元数点局部坐标系更新计算 Loc_New_Point=Q*Loc_Old_Point*Q_N
+	//------计算1次相乘
+	GL_Quater Q011=MUL_Q(Qt0,Q_Point);
+	//------计算2次相乘
+	GL_Quater Q022=MUL_Q(Q011,Qt0_N);
+
+	glPushMatrix();//储存当前视图矩阵
+	glLineWidth(1); 
+	glColor3f(r,g,b); 
+	glTranslatef(pos_x+Q022.q1,pos_y+Q022.q2,pos_z+Q022.q3);
+	glutSolidSphere(0.6, 20, 20);
+	glPopMatrix();//弹出上次保存的位置
+
+	Pt.x=pos_x+Q022.q1;
+	Pt.y=pos_y+Q022.q2;
+	Pt.z=pos_z+Q022.q3;
+
+	return Pt;
+}
+
+void GL_Head_Display()
+{
+	//绘制 旋转长方体
+	glPushMatrix();
+	glTranslatef(pos_x,pos_y,pos_z);         
+	glRotatef(Ww,q1,q2,q3);
+	glColor3f(0.8f, 0.2f, 0.0f );
+	glScaled(10,5,2);
+	glutSolidCube(1);
+	glPopMatrix(); 
+
+	glPushMatrix();
+	glTranslatef(pos_x,pos_y,pos_z);         
+	glRotatef(Ww,q1,q2,q3);
+	glColor3f(0.0f, 1.0f, 0.0f );
+	glScaled(6,2.5,2);
+	glutSolidCube(1);
+	glPopMatrix();
+
+	//------
+	GL_Quater Qt0;
+	Qt0.q0=q0;
+	Qt0.q1=q1;
+	Qt0.q2=q2;
+	Qt0.q3=q3;
+
+	GL_Quater_Point(Qt0,0,0,0,1.0,0.1,1.0);
+
+	GL_Quater_Point(Qt0,5,0,0,1,0,0);
+	GL_Quater_Point(Qt0,-5,0,0,1,0,0);
+	GL_Quater_Point(Qt0,0,-4,0,0,0,1);
+	GL_Quater_Point(Qt0,0,4,0,0,0,1);
+
+	//
+
+	GL_Quater_Point(Qt0,4,4,0,0,0.8,0);
+	GL_Quater_Point(Qt0,-4,4,0,0,0.8,0);
+	GL_Quater_Point(Qt0,4,-4,0,0.9,0.8,0);
+	GL_Quater_Point(Qt0,-4,-4,0,0.9,0.8,0);
+
+	//
+	
+}
+
 void display(void)
 {  
 	glClear (GL_COLOR_BUFFER_BIT);
@@ -457,6 +539,12 @@ void display(void)
 	
 	GL_Draw_Filed();
 	GL_Scan();
+
+	GLB_IMU(gxr_Global,gyr_Global, gzr_Global,1 ) ;
+	gxr_Global=0;
+	gyr_Global=0;
+	gzr_Global=0;
+	GL_Head_Display();
 	/********************************************/
 	glutSwapBuffers();
 }
@@ -474,7 +562,7 @@ DWORD _stdcall ThreadProc(LPVOID lpParameter)//线程执行函数
 	glutDisplayFunc(display); 
 	glutReshapeFunc(reshape);
 	glutKeyboardFunc(glutKeyboard);    // called when the application receives a input from the keyboard
-  
+    
 	glutMainLoop();
 	return 0;
 }

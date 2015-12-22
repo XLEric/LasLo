@@ -44,8 +44,11 @@ int main(int argc, char *argv[])
 		if( !image ) break;
 		//cvShowImage("Image",image);
 
-		
-		int c = cvWaitKey(20);
+		for(int i=0;i<5000;i++)
+		{
+			;
+		}
+		int c = cvWaitKey(40);
 		if(c == 'p'){  
 			c = 0;
 			while(c != 'p' && c != 27){
