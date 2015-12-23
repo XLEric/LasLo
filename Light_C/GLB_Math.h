@@ -14,12 +14,31 @@ typedef struct _GL_Vector_
 	float z;
 }GL_Vector;
 
+GL_Vector Plan_XNorml,Plan_YNorml;
+GL_Vector LineRays[9];
+typedef struct _GL_Plan_
+{
+	float A;
+	float B;
+	float C;
+	float D;
+}GL_Plan;
+
+GL_Plan GL_PlanX,GL_PlanY;
+
+GL_Plan GL_PlanXS[9],GL_PlanYS[9];
+
 typedef struct _GL_Point_
 {
 	float x;
 	float y;
 	float z;
+	
 }GL_Point;
+
+GL_Point HandPlay_Pt[9];
+bool EnableX[9];
+bool EnableY[9];
 
 typedef struct _GL_Quater_ //四元数简易 结构体
 {
@@ -28,6 +47,8 @@ typedef struct _GL_Quater_ //四元数简易 结构体
 	float q2;
 	float q3;
 }GL_Quater;
+
+
 
 //-------------------------------------------------------
 float q0 = 1, q1 = 0, q2 = 0, q3 = 0;        // 四元数

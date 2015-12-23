@@ -37,6 +37,7 @@ int main(int argc, char *argv[])
 	printf("\t~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ GL_Start!\n");
 	printf("\t~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ GL_Start!\n");
 	printf("\t~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ GL_Start!\n");
+	cvWaitKey(300);
 	while(1)
 	{
 		
@@ -48,7 +49,7 @@ int main(int argc, char *argv[])
 		{
 			;
 		}
-		int c = cvWaitKey(40);
+		int c = cvWaitKey(300);
 		if(c == 'p'){  
 			c = 0;
 			while(c != 'p' && c != 27){

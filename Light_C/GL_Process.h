@@ -32,24 +32,27 @@ char buf_T[256];
 int angle_GL=0;
 bool flag_stop=0;
 
-GLfloat eyex=0,eyey=160,eyez=350;
+GLfloat eyex=0,eyey=130,eyez=320;
 float Step_X1=0,Step_X2=0;
 bool flag_StepX=0;
-int Angle_Y=0;
+float Angle_Y=0;
 
 bool Flag_X=0,Flag_Y=1;
 
-float pos_x=0,pos_y=50,pos_z=30;
+float pos_x=0,pos_y=30,pos_z=100;
 int gxr_Global=0;
 int gyr_Global=0;
 int gzr_Global=0;
+
+bool GL_Flag_Stop=0;
 //------------------------------------------------------------------ OpenGL
+/**********************************************************/
 void init(void) 
 {
 	glClearColor (0.0, 0.0, 0.0, 0.0);
 	glShadeModel (GL_FLAT);
 }
-
+/**********************************************************/
 void glutKeyboard(unsigned char key, int x, int y)
 {
 	switch (key)
@@ -75,9 +78,21 @@ void glutKeyboard(unsigned char key, int x, int y)
 	case'S':gyr_Global=-3;break;
 	case'd':gzr_Global=3;break;
 	case'D':gzr_Global=-3;break;
+
+	case'p':
+	case'P':GL_Flag_Stop=1;break;
+	case'o':
+	case'O':GL_Flag_Stop=0;break;
+
+	case'r':
+	case'R':
+		eyex=0;eyey=130;eyez=320;
+		pos_x=0;pos_y=30;pos_z=100;
+		q0=1;q1=0;q2=0;q3=0;Ww=0;
+		break;
 	}
 }
-
+/**********************************************************/
 void glutMouse(int button, int state, int x, int y)
 {
 	/*if(state == GLUT_DOWN)
@@ -103,7 +118,7 @@ void glutMouse(int button, int state, int x, int y)
 	} else if (state == GLUT_UP)
 		mButton = -1;*/
 }
-
+/**********************************************************/
 void reshape (int w, int h)
 {
 	glViewport (0, 0, (GLsizei) w, (GLsizei) h); 
@@ -115,7 +130,7 @@ void reshape (int w, int h)
 	gluLookAt (eyex,eyey,eyez, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 	//glRotatef(5,0,1,0);
 }
-
+/**********************************************************/
 void renderCube(float size)
 {
 	glBegin(GL_QUADS);
@@ -157,10 +172,8 @@ void renderCube(float size)
 	glVertex3f( 0.0f,  0.0f, size);
 	glEnd();
 }
-
-/**************************************************/
+/**********************************************************/
 //场地边长： 45*4 单位
-
 void GL_Draw_Filed()
 {
 	glPushMatrix();
@@ -286,6 +299,7 @@ void GL_Draw_Filed()
 	glutSolidSphere(6, 15, 15);
 	glPopMatrix();
 }
+/******************************XY面扫描****************************/
 void GL_Scan()
 {
 	float Edge=45*2;
@@ -296,11 +310,11 @@ void GL_Scan()
 	float x1,y1,z1;
 	//------ X Scan
 	//(x-x0)/a1=(z-z0)/c1=t
-	if(Flag_X==0)
+	if(Flag_X==0 )
 	{
-		if(flag_StepX==0)
+		if(flag_StepX==0 && !GL_Flag_Stop)
 		{
-			Step_X1+=1.0f/90.0f;
+			Step_X1+=0.5f/90.0f;
 		}
 
 		if(Step_X1>1.0f)flag_StepX=1;
@@ -308,9 +322,9 @@ void GL_Scan()
 		y1=0;
 		z1=Step_X1*c1-0;
 
-		if(flag_StepX==1)
+		if(flag_StepX==1 && !GL_Flag_Stop)
 		{
-			Step_X2+=1.8f/52.0f*52;
+			Step_X2+=0.5f/52.0f*52;
 			y1=Step_X2;
 
 			if(Step_X2>52)
@@ -364,7 +378,7 @@ void GL_Scan()
 		glPopMatrix();
 
 		glLineWidth(2); 
-		glBegin(GL_LINES);//绘制居中轨迹
+		glBegin(GL_LINES);
 		glColor3f(0.05f, 0.6f, 0.9f); 
 		glVertex3f(-Edge,52,0);
 		glVertex3f(xl,yl,zl);
@@ -373,22 +387,56 @@ void GL_Scan()
 		glVertex3f(xl,yl,zl);
 		glVertex3f(xr,yr,zr);
 		glEnd();
+
+		//------
+		//平面的向量
+		float ax=-Edge-x1;
+		float ay=52-y1;
+		float az=0-z1;
+
+		float bx=xr-xl;
+		float by=yr-yl;
+		float bz=zr-zl;
+		//获得平面叉积 法向量
+		Plan_XNorml=GLB_CHAJI(ax, ay, az, bx, by, bz);
+		GL_PlanX.A=Plan_XNorml.x;
+		GL_PlanX.B=Plan_XNorml.y;
+		GL_PlanX.C=Plan_XNorml.z;
+
+		//AX+BY+CZ+D=0 => D=-AX-BY-CZ
+		GL_PlanX.D=-(GL_PlanX.A*xr+GL_PlanX.B*yr+GL_PlanX.C*zr);
+
+		glLineWidth(3); //绘制垂线
+		glBegin(GL_LINES);
+		glColor3f(1.0f, 0.2f, 0.9f); 
+		glVertex3f(x1,y1,z1);
+		glVertex3f(x1+GL_PlanX.A*20,y1+GL_PlanX.B*20,z1+GL_PlanX.C*20);
+		glEnd();
 	}
 	
 	//------ Y Scan
-	if(Flag_Y==0)
+	if(Flag_Y==0  )
 	{
 		float Rr=Edge*2*1.414;
 		float x2=cos(float(Angle_Y)*CV_PI/180)*Rr-Edge;
 		float y2=0;
 		float z2=sin(float(Angle_Y)*CV_PI/180)*Rr;
-
-		Angle_Y++;
+		if(!GL_Flag_Stop)
+		Angle_Y+=0.2;
 		if(Angle_Y>90)
 		{
 			Angle_Y=0;
 			Flag_X=0;
 			Flag_Y=1;
+
+			int num=9;
+			//初始化 目标点的X扫描面 与 Y扫描面 标志
+			for(int i=0;i<num;i++)
+			{
+				EnableX[i]=0;
+				EnableY[i]=0;
+			}
+			
 		}
 
 		glPushMatrix();
@@ -414,12 +462,36 @@ void GL_Scan()
 
 		glEnd();
 
-		glBegin(GL_LINES);//绘制居中轨迹
+		glBegin(GL_LINES);
 		glColor3f(1.1f, 0.0f, 0.0f); 
 
 		glVertex3f(x2,y2,z2);
 		glVertex3f(x2,y2+52,z2);
 
+		glEnd();
+
+		//平面的向量
+		float ax=-Edge-x2;
+		float ay=52-y2;
+		float az=0-z2;
+
+		float bx=0;
+		float by=52;
+		float bz=0;
+		Plan_YNorml=GLB_CHAJI(ax, ay, az, bx, by, bz);
+
+		GL_PlanY.A=Plan_YNorml.x;
+		GL_PlanY.B=Plan_YNorml.y;
+		GL_PlanY.C=Plan_YNorml.z;
+
+		//AX+BY+CZ+D=0 => D=-AX-BY-CZ
+		GL_PlanY.D=-(GL_PlanY.A*x2+GL_PlanY.B*y2+GL_PlanY.C*z2);
+
+		glLineWidth(3); //绘制垂线
+		glBegin(GL_LINES);
+		glColor3f(0.0f, 1.0f, 1.0f); 
+		glVertex3f(x2,y2+26,z2);
+		glVertex3f(x2+GL_PlanY.A*20,y2+26+GL_PlanY.B*20,z2+GL_PlanY.C*20);
 		glEnd();
 
 		
@@ -428,7 +500,7 @@ void GL_Scan()
 
 
 }
-
+/**********************************************************/
 GL_Point GL_Quater_Point(GL_Quater Qt0,float x_offset,float y_offset,float z_offset,float r,float g,float b)
 {
 	GL_Point Pt;
@@ -459,7 +531,44 @@ GL_Point GL_Quater_Point(GL_Quater Qt0,float x_offset,float y_offset,float z_off
 
 	return Pt;
 }
+/**********************************************************/
+// Flag_XY :XY平面，0点未在该平面，1点在该平面上。
+bool GL_Plan_Dis(GL_Point Pt,GL_Plan &GL_PlanS,GL_Plan Plan,bool &Flag_XY)
+{
+	bool flag=0;
+	float A=Plan.A;
+	float B=Plan.B;
+	float C=Plan.C;
+	float D=Plan.D;
 
+	float x=Pt.x;
+	float y=Pt.y;
+	float z=Pt.z;
+
+	float dist=abs(A*x+B*y+C*z+D)/sqrt(A*A+B*B+C*C);
+	if(dist<0.3)
+	{
+		glPushMatrix();//储存当前视图矩阵
+		glLineWidth(1); 
+		glColor3f(0.8,0.8,0.8); 
+		glTranslatef(x,y,z);
+		glutSolidSphere(0.8, 20, 20);
+		glPopMatrix();//弹出上次保存的位置
+
+		//------如果满足 点在平面要求则认为 点在平面上
+		
+			GL_PlanS.A=Plan.A;
+			GL_PlanS.B=Plan.B;
+			GL_PlanS.C=Plan.C;
+			GL_PlanS.D=Plan.D;
+		
+		Flag_XY=1;
+		flag=1;
+	}
+
+	return flag;
+}
+/**********************************************************/
 void GL_Head_Display()
 {
 	//绘制 旋转长方体
@@ -480,30 +589,102 @@ void GL_Head_Display()
 	glPopMatrix();
 
 	//------
+	
+}
+/**********************************************************/
+void GL_GotHead_DisPlay_Pt()
+{
 	GL_Quater Qt0;
 	Qt0.q0=q0;
 	Qt0.q1=q1;
 	Qt0.q2=q2;
 	Qt0.q3=q3;
 
-	GL_Quater_Point(Qt0,0,0,0,1.0,0.1,1.0);
+	HandPlay_Pt[0]=GL_Quater_Point(Qt0,0,0,0,1.0,0.1,1.0);
 
-	GL_Quater_Point(Qt0,5,0,0,1,0,0);
-	GL_Quater_Point(Qt0,-5,0,0,1,0,0);
-	GL_Quater_Point(Qt0,0,-4,0,0,0,1);
-	GL_Quater_Point(Qt0,0,4,0,0,0,1);
-
-	//
-
-	GL_Quater_Point(Qt0,4,4,0,0,0.8,0);
-	GL_Quater_Point(Qt0,-4,4,0,0,0.8,0);
-	GL_Quater_Point(Qt0,4,-4,0,0.9,0.8,0);
-	GL_Quater_Point(Qt0,-4,-4,0,0.9,0.8,0);
+	HandPlay_Pt[1]=GL_Quater_Point(Qt0,5,0,0,1,0,0);
+	HandPlay_Pt[2]=GL_Quater_Point(Qt0,-5,0,0,1,0,0);
+	HandPlay_Pt[3]=GL_Quater_Point(Qt0,0,-4,0,0,0,1);
+	HandPlay_Pt[4]=GL_Quater_Point(Qt0,0,4,0,0,0,1);
 
 	//
+	HandPlay_Pt[5]=GL_Quater_Point(Qt0,4,4,0,0,0.8,0);
+	HandPlay_Pt[6]=GL_Quater_Point(Qt0,-4,4,0,0,0.8,0);
+	HandPlay_Pt[7]=GL_Quater_Point(Qt0,4,-4,0,0.9,0.8,0);
+	HandPlay_Pt[8]=GL_Quater_Point(Qt0,-4,-4,0,0.9,0.8,0);
+
+	int num=9;
+	for(int i=0;i<num;i++)
+	{
+			bool flagx=GL_Plan_Dis(HandPlay_Pt[i],GL_PlanXS[i],GL_PlanX,EnableX[i]);	
+			bool flagy=GL_Plan_Dis(HandPlay_Pt[i],GL_PlanYS[i],GL_PlanY,EnableY[i]);		
+	}
+	
+
+	/*FILE *file=fopen(".//log.txt","a+");
+	for(int i=0;i<num;i++)
+	{
+		if(EnableX[i] && EnableY[i])
+		{
+			fprintf(file,"XY:%d %d:(%f,%f,%f) (%f,%f,%f)\n",EnableX[i],EnableY[i],
+				GL_PlanXS[i].A,GL_PlanXS[i].B,GL_PlanXS[i].C,
+				GL_PlanYS[i].A,GL_PlanYS[i].B,GL_PlanYS[i].C);
+		}
+	}
+	fclose(file);*/
 	
 }
+/**********************************************************/
+void GL_LineRays()
+{
+	int num=9;
+	for(int i=0;i<num;i++)
+	{
+		if(EnableX[i] && EnableY[i])
+		{
+			//获取两平面的交线向量
+			float bx=GL_PlanXS[i].A;
+			float by=GL_PlanXS[i].B;
+			float bz=GL_PlanXS[i].C;
 
+			float ax=GL_PlanYS[i].A;
+			float ay=GL_PlanYS[i].B;
+			float az=GL_PlanYS[i].C;
+			//获得平面叉积 法向量
+			LineRays[i]=GLB_CHAJI(ax, ay, az, bx, by, bz);
+
+			float x0=-90;//直线上的点
+			float y0=52;
+			float z0=0;
+
+			float x=HandPlay_Pt[0].x;
+			float y=HandPlay_Pt[0].y;
+			float z=HandPlay_Pt[0].z;
+			//--------------
+			float Dis=sqrt((x-x0)*(x-x0)+(y-y0)*(y-y0)+(z-z0)*(z-z0));
+
+			//--------------
+			glLineWidth(2); 
+			glBegin(GL_LINES);
+			glColor3f(0.05f, 0.6f, 0.9f); 
+			glVertex3f(x0,y0,z0);
+			glVertex3f(x0+LineRays[i].x*Dis,
+				y0+LineRays[i].y*Dis,
+				z0+LineRays[i].z*Dis);
+			glEnd();
+
+			//--------------
+			glPushMatrix();//储存当前视图矩阵
+			glLineWidth(1); 
+			glColor3f(0.8,0.8,0.8); 
+			glTranslatef(HandPlay_Pt[i].x,HandPlay_Pt[i].y,HandPlay_Pt[i].z);
+			glutSolidSphere(0.8, 20, 20);
+			glPopMatrix();//弹出上次保存的位置
+		}
+
+	}
+}
+/**********************************************************/
 void display(void)
 {  
 	glClear (GL_COLOR_BUFFER_BIT);
@@ -536,7 +717,6 @@ void display(void)
 	//glScaled(2,15,2);
 	//glutSolidCube(2);
 
-	
 	GL_Draw_Filed();
 	GL_Scan();
 
@@ -545,18 +725,27 @@ void display(void)
 	gyr_Global=0;
 	gzr_Global=0;
 	GL_Head_Display();
+	GL_GotHead_DisPlay_Pt();
+	GL_LineRays();
 	/********************************************/
 	glutSwapBuffers();
 }
+/**********************************************************/
 void myIdle(void) 
 {  
 	angle_GL++;
 
 }
-/************************************************/
+/**********************************************************/
 DWORD _stdcall ThreadProc(LPVOID lpParameter)//线程执行函数
 {
 	glutCreateWindow("三维模型"); 
+	int num=9;//初始化 目标点的X扫描面 与 Y扫描面 标志
+	for(int i=0;i<num;i++)
+	{
+		EnableX[i]=0;
+		EnableY[i]=0;
+	}
 	init ();
 	glutIdleFunc(&myIdle);
 	glutDisplayFunc(display); 
