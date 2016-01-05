@@ -28,28 +28,30 @@ int main(int argc, char *argv[])
 #endif
 
 	
-	CvCapture* capture1=cvCreateCameraCapture(1 );
-
-
+	/*CvCapture* capture1=cvCreateCameraCapture(1 );
 	cvSetCaptureProperty ( capture1, CV_CAP_PROP_FRAME_WIDTH,  320 );  
-	cvSetCaptureProperty ( capture1, CV_CAP_PROP_FRAME_HEIGHT, 240 );
-	IplImage *image = cvQueryFrame( capture1 );
+	cvSetCaptureProperty ( capture1, CV_CAP_PROP_FRAME_HEIGHT, 240 );*/
+	//IplImage *image = cvQueryFrame( capture1 );
+	IplImage *image=cvLoadImage("1.jpg");
+	//IplImage *image=cvCreateImage(cvSize(240,120),IPL_DEPTH_8U, 1);
 	printf("\t~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ GL_Start!\n");
 	printf("\t~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ GL_Start!\n");
 	printf("\t~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ GL_Start!\n");
 	cvWaitKey(300);
+	//cvNamedWindow("Image",0);
 	while(1)
 	{
 		
-		image = cvQueryFrame( capture1 );
-		if( !image ) break;
-		//cvShowImage("Image",image);
+		/*image = cvQueryFrame( capture1 );
+		if( !image ) break;*/
+		
+		cvShowImage("Image",image);
 
-		for(int i=0;i<5000;i++)
+		/*for(int i=0;i<5000;i++)
 		{
-			;
-		}
-		int c = cvWaitKey(300);
+		;
+		}*/
+		int c = cvWaitKey(50);
 		if(c == 'p'){  
 			c = 0;
 			while(c != 'p' && c != 27){
@@ -62,7 +64,7 @@ int main(int argc, char *argv[])
 		if(flag_stop)break;
 		glutPostRedisplay();
 	}
-	cvReleaseCapture( &capture1 );
+	//cvReleaseCapture( &capture1 );
 	return 0;
 }
 

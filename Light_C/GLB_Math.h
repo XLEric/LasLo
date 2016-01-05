@@ -320,30 +320,30 @@ void GLB_IMU(int gxr, int gyr, int gzr, float halfT )
 
 	   Ww=acos(q0)*2*180/CV_PI;//---- 融合 磁偏角 q0 改为 qq0
 
-	////更新方向余弦矩阵
-	//t11=q0*q0+q1*q1-q2*q2-q3*q3;
-	//t12=2.0*(q1*q2+q0*q3);
-	//t13=2.0*(q1*q3-q0*q2);
-	//t21=2.0*(q1*q2-q0*q3);
-	//t22=q0*q0-q1*q1+q2*q2-q3*q3;
-	//t23=2.0*(q2*q3+q0*q1);
-	//t31=2.0*(q1*q3+q0*q2);
-	//t32=2.0*(q2*q3-q0*q1);
-	//t33=q0*q0-q1*q1-q2*q2+q3*q3;
+	//更新方向余弦矩阵
+	float t11=q0*q0+q1*q1-q2*q2-q3*q3;
+	float t12=2.0*(q1*q2+q0*q3);
+	float t13=2.0*(q1*q3-q0*q2);
+	float t21=2.0*(q1*q2-q0*q3);
+	float t22=q0*q0-q1*q1+q2*q2-q3*q3;
+	float t23=2.0*(q2*q3+q0*q1);
+	float t31=2.0*(q1*q3+q0*q2);
+	float t32=2.0*(q2*q3-q0*q1);
+	float t33=q0*q0-q1*q1-q2*q2+q3*q3;
 
 	////------ 偏航角——Yaw,俯仰角——Pitch,翻滚角——Rool  （弧度）
-	//Rool = atan2(t23,t33);
-	//Pitch = -asin(t13);
+	Rool = atan2(t23,t33);
+	Pitch = -asin(t13);
 
-	//Yaw = atan2(t12,t11);
+	Yaw = atan2(t12,t11);
 
-	//if (Yaw < 0) Yaw += 360/180*3.14159;
-	//
-	////--- 弧度转为角度
-	//Rool_angle = Rool/3.14159*180;
-	//Pitch_angle = Pitch/3.14159*180;
-	//Yaw_angle = Yaw/3.14159*180;
-	////printf("-%d %d %d \n",Pitch_angle,Rool_angle ,Yaw_angle );
+	if (Yaw < 0) Yaw += 360/180*3.14159;
+	
+	//--- 弧度转为角度
+	Rool_angle = Rool/CV_PI*180;
+	Pitch_angle = Pitch/CV_PI*180;
+	Yaw_angle = Yaw/CV_PI*180;
+	
 
 	
 }
