@@ -4,67 +4,9 @@
 #include <glut.h>
 #include <windows.h>
 #include <math.h>
+#include "Param_GL.h"
 
 int Compass_Yaw_Data[8]={0};
-
-typedef struct _GL_Vector_
-{
-	float x;
-	float y;
-	float z;
-}GL_Vector;
-
-GL_Vector Plan_XNorml,Plan_YNorml;
-GL_Vector LineRays[9];
-typedef struct _GL_Plan_
-{
-	float A;
-	float B;
-	float C;
-	float D;
-}GL_Plan;
-
-GL_Plan GL_PlanX,GL_PlanY;
-
-GL_Plan GL_PlanXS[9],GL_PlanYS[9];
-
-typedef struct _GL_Point_
-{
-	float x;
-	float y;
-	float z;
-	
-}GL_Point;
-
-GL_Point HandPlay_Pt[9];
-bool EnableX[9];
-bool EnableY[9];
-
-typedef struct _GL_Quater_ //四元数简易 结构体
-{
-	float q0;
-	float q1;
-	float q2;
-	float q3;
-}GL_Quater;
-
-
-
-//-------------------------------------------------------
-float q0 = 1, q1 = 0, q2 = 0, q3 = 0;        // 四元数
-float Ww=0;
-
-// 偏航角——Yaw,俯仰角——Pitch,翻滚角——Rool
-float Pitch;//弧度
-float Rool ;
-float Yaw  ;
-
-short Pitch_angle;//角度
-short Rool_angle ;
-short Yaw_angle  ;
-
-float G0=9.8;//初始化
-
 
 
 /*********************************************************************/
@@ -346,5 +288,22 @@ void GLB_IMU(int gxr, int gyr, int gzr, float halfT )
 	
 
 	
+}
+
+/************************************************************************/
+//AB的cos夹角=（向量AC*向量AB）/（AC的模*AB的模）
+float GL_COS_Angle(GL_Vector A,GL_Vector B)
+{
+	float a=A.x*B.x+A.y*B.y+A.z*B.z;
+	float b1=A.x*A.x+A.y*A.y+A.z*A.z;
+	float b2=B.x*B.x+B.y*B.y+B.z*B.z;
+	float b=sqrt(b1*b2);
+
+	float angle_f=0;
+	if(b!=0)
+	{
+		angle_f=acos(a/b);
+	}
+	return angle_f;
 }
 #endif

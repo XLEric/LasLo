@@ -30,6 +30,9 @@
     <ClInclude Include="GLB_Math.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Param_GL.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

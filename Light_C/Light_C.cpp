@@ -12,6 +12,7 @@
 using namespace cv;
 using namespace std;
 
+#if 0
 int main(int argc, char *argv[])
 {
 #if 1
@@ -68,3 +69,43 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
+#else
+int main(int argc, char* argv[])
+{
+
+	printf("\t~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ GL_Start!\n");
+	printf("\t~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ GL_Start!\n");
+	printf("\t~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ GL_Start!\n");
+	cvWaitKey(100);
+	
+	glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB);
+	glutInitWindowSize (320*2,240*2); 
+	glutInitWindowPosition (0, 0);
+	glutInit(&argc, argv);
+
+
+	glutCreateWindow("三维模型"); 
+	int num=10;//初始化 目标点的X扫描面 与 Y扫描面 标志
+	for(int i=0;i<num;i++)
+	{
+		EnableX[i]=0;
+		EnableY[i]=0;
+		DistsX_min[i]=60000;
+		DistsY_min[i]=60000;
+
+		New_FpsX[i]=0;
+		New_FpsY[i]=0;
+	}
+	init ();
+	glutIdleFunc(&myIdle);
+	glutDisplayFunc(display); 
+	glutIdleFunc(display);//必须加这个函数 不然GL停止刷新
+	glutReshapeFunc(reshape);
+	glutKeyboardFunc(glutKeyboard);    // called when the application receives a input from the keyboard
+
+
+	glutMainLoop();
+	
+	return 0;
+}
+#endif
