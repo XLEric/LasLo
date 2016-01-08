@@ -41,14 +41,14 @@ float Angle_Y=0,Angle_X=0;
 
 bool Flag_X=0,Flag_Y=1;
 
-float pos_x=0,pos_y=28,pos_z=150;
+float pos_x=0,pos_y=65,pos_z=150;
 int gxr_Global=0;
 int gyr_Global=0;
 int gzr_Global=0;
 
 bool GL_Flag_Stop=0;
 bool Best_Flag=0;//一帧显示一次最优拟合标志
-float t1_Global=60,t2_Global=60,t3_Global=60,t4_Global=60;
+float t1_Global=60,t2_Global=60,t3_Global=60,t4_Global=60,t5_Global=60;
 IplImage *frame_GL=cvCreateImage(cvSize(800,400),IPL_DEPTH_8U, 3);
 
 int Step_Recursion=0;
@@ -234,12 +234,12 @@ void GL_Draw_Filed()
 	glTranslatef(Edge,0,0);
 	glRotatef(-90,1,0,0);
 	glColor3f(0.5f, 0.2f, 1.0f); 
-	gluCylinder(cylinder_obj, 3, 3, 40, 20, 30);   
+	gluCylinder(cylinder_obj, 3, 3, 61, 20, 30);   
 	glPopMatrix();
 
 	glPushMatrix();//---- 1
 	glLineWidth(1); 
-	glTranslatef(Edge,40,0);
+	glTranslatef(Edge,61,0);
 
 	glRotatef(angle_GL,0,1,0);
 
@@ -253,12 +253,12 @@ void GL_Draw_Filed()
 	glTranslatef(-Edge,0,0);
 	glRotatef(-90,1,0,0);
 	glColor3f(0.5f, 0.2f, 1.0f); 
-	gluCylinder(cylinder_obj, 3, 3, 40, 20, 30);   
+	gluCylinder(cylinder_obj, 3, 3, 61, 20, 30);   
 	glPopMatrix();
 
 	glPushMatrix();//---- 2
 	glLineWidth(1); 
-	glTranslatef(-Edge,40,0);
+	glTranslatef(-Edge,61,0);
 
 	glRotatef(angle_GL,0,1,0);
 
@@ -271,12 +271,12 @@ void GL_Draw_Filed()
 	glTranslatef(Edge,0,Edge2);
 	glRotatef(-90,1,0,0);
 	glColor3f(0.5f, 0.2f, 1.0f); 
-	gluCylinder(cylinder_obj, 3, 3, 40, 20, 30);   
+	gluCylinder(cylinder_obj, 3, 3, 61, 20, 30);   
 	glPopMatrix();
 
 	glPushMatrix();
 	glLineWidth(1); 
-	glTranslatef(Edge,40,Edge2);//---- 3
+	glTranslatef(Edge,61,Edge2);//---- 3
 
 	glRotatef(angle_GL,0,1,0);
 
@@ -290,12 +290,12 @@ void GL_Draw_Filed()
 	glTranslatef(-Edge,0,Edge2);
 	glRotatef(-90,1,0,0);
 	glColor3f(0.5f, 0.2f, 1.0f); 
-	gluCylinder(cylinder_obj, 3, 3, 40, 20, 30);   
+	gluCylinder(cylinder_obj, 3, 3, 61, 20, 30);   
 	glPopMatrix();
 
 	glPushMatrix();//---- 4
 	glLineWidth(1); 
-	glTranslatef(-Edge,40,Edge2);
+	glTranslatef(-Edge,61,Edge2);
 
 	glRotatef(angle_GL,0,1,0);
 
@@ -323,7 +323,7 @@ void GL_Draw_Filed()
 	//------ Light A
 	glPushMatrix();
 	glLineWidth(1); 
-	glTranslatef(-Edge,52,0);
+	glTranslatef(-Edge,81,0);
 	glRotatef(angle_GL,0,1,0);
 	glColor3f(0.0f, 1.0f, 1.0f); 
 	glutSolidSphere(6, 15, 15);
@@ -332,7 +332,7 @@ void GL_Draw_Filed()
 	//------ Light B
 	glPushMatrix();
 	glLineWidth(1); 
-	glTranslatef(Edge,52,Edge2);
+	glTranslatef(Edge,81,Edge2);
 	glRotatef(angle_GL,0,1,0);
 	glColor3f(1.0f, 0.0f, 1.0f); 
 	glutSolidSphere(6, 15, 15);
@@ -365,10 +365,10 @@ void GL_Scan(float Step_Scan)
 
 		if(flag_StepX==1 && !GL_Flag_Stop)
 		{
-			Step_X2+=0.5f/52.0f*52;
+			Step_X2+=0.5f/81.0f*81;
 			y1=Step_X2;
 
-			if(Step_X2>52)
+			if(Step_X2>81)
 			{
 				flag_StepX=0;
 				Step_X1=0;
@@ -388,7 +388,7 @@ void GL_Scan(float Step_Scan)
 		glLineWidth(2); 
 		glBegin(GL_LINES);
 		glColor3f(0.15f, 0.9f, 0.0f); 
-		glVertex3f(-Edge,52,0);
+		glVertex3f(-Edge,81,0);
 		glVertex3f(x1,y1,z1);
 
 		glEnd();
@@ -421,9 +421,9 @@ void GL_Scan(float Step_Scan)
 		glLineWidth(2); 
 		glBegin(GL_LINES);
 		glColor3f(0.05f, 0.6f, 0.9f); 
-		glVertex3f(-Edge,52,0);
+		glVertex3f(-Edge,81,0);
 		glVertex3f(xl,yl,zl);
-		glVertex3f(-Edge,52,0);
+		glVertex3f(-Edge,81,0);
 		glVertex3f(xr,yr,zr);
 		glVertex3f(xl,yl,zl);
 		glVertex3f(xr,yr,zr);
@@ -432,7 +432,7 @@ void GL_Scan(float Step_Scan)
 		//------
 		//平面的向量
 		float ax=-Edge-x1;
-		float ay=52-y1;
+		float ay=81-y1;
 		float az=0-z1;
 
 		float bx=xr-xl;
@@ -462,7 +462,7 @@ if(Flag_X==0 )
 
 	float Rr=90*2;
 	x1=-Edge;
-	y1=(1-cos(float(Angle_X)*CV_PI/180))*52;
+	y1=(1-cos(float(Angle_X)*CV_PI/180))*81;
 	z1=sin(float(Angle_X)*CV_PI/180)*Rr;
 
 	if(Angle_X>90.0f)
@@ -480,7 +480,7 @@ if(Flag_X==0 )
 	glLineWidth(2); 
 	glBegin(GL_LINES);
 	glColor3f(0.15f, 0.9f, 0.0f); 
-	glVertex3f(-Edge,52,0);
+	glVertex3f(-Edge,81,0);
 	glVertex3f(x1,y1,z1);
 
 	glEnd();
@@ -500,7 +500,7 @@ if(Flag_X==0 )
 	glPopMatrix();
 	////------
 	float xr=Edge2;
-	float yr=52;
+	float yr=81;
 	float zr=0;
 
 
@@ -515,7 +515,7 @@ if(Flag_X==0 )
 	glLineWidth(2); 
 	glBegin(GL_LINES);
 	glColor3f(0.05f, 0.6f, 0.9f); 
-	glVertex3f(-Edge,52,0);
+	glVertex3f(-Edge,81,0);
 	glVertex3f(x1,y1,z1);
 
 	glVertex3f(x1,y1,z1);
@@ -525,7 +525,7 @@ if(Flag_X==0 )
 	glVertex3f(xr,yr,zr);
 
 	glVertex3f(xr,yr,zr);
-	glVertex3f(-Edge,52,0);
+	glVertex3f(-Edge,81,0);
 	glEnd();
 
 	//------
@@ -535,7 +535,7 @@ if(Flag_X==0 )
 	float az=0;
 //
 	float bx=x1+Edge;
-	float by=y1-52;
+	float by=y1-81;
 	float bz=z1-0;
 	//获得平面叉积 法向量
 	Plan_XNorml=GLB_CHAJI(ax, ay, az, bx, by, bz);
@@ -592,7 +592,7 @@ if(Flag_X==0 )
 				pos_x=pos_x+xr;
 			}
 
-			if(abs(pos_y+yr)>8 && abs(pos_y+yr)<42 )
+			if(abs(pos_y+yr)>8 && abs(pos_y+yr)<81-8 )
 			{
 				pos_y=pos_y+yr;
 			}
@@ -623,7 +623,7 @@ if(Flag_X==0 )
 		glPopMatrix();
 
 		glPushMatrix();
-		glTranslatef(x2,y2+52,z2);
+		glTranslatef(x2,y2+81,z2);
 		glRotatef(angle_GL,0,1,0);
 		glColor3f(0.0f, 1.0f, 0.0f); 
 		glutSolidSphere(3, 15, 15);
@@ -633,8 +633,8 @@ if(Flag_X==0 )
 		glColor3f(0.01f, 1.0f, 1.0f); 
 		glVertex3f(-Edge,0,0);
 		glVertex3f(x2,y2,z2);
-		glVertex3f(-Edge,52,0);
-		glVertex3f(x2,y2+52,z2);
+		glVertex3f(-Edge,81,0);
+		glVertex3f(x2,y2+81,z2);
 
 		glEnd();
 
@@ -642,17 +642,17 @@ if(Flag_X==0 )
 		glColor3f(1.1f, 0.0f, 0.0f); 
 
 		glVertex3f(x2,y2,z2);
-		glVertex3f(x2,y2+52,z2);
+		glVertex3f(x2,y2+81,z2);
 
 		glEnd();
 
 		//平面的向量
 		float ax=-Edge-x2;
-		float ay=52-y2;
+		float ay=81-y2;
 		float az=0-z2;
 
 		float bx=0;
-		float by=52;
+		float by=81;
 		float bz=0;
 		Plan_YNorml=GLB_CHAJI(ax, ay, az, bx, by, bz);
 
@@ -790,16 +790,16 @@ void GL_GotHead_DisPlay_Pt()
 	
 	HeadPlay_Pt[0]=GL_Quater_Point(Qt0,0,0,0,1.0,0.1,1.0);
 
-	HeadPlay_Pt[1]=GL_Quater_Point(Qt0,5,0,0,1,0,0);
-	HeadPlay_Pt[2]=GL_Quater_Point(Qt0,-5,0,0,1,0,0);
-	HeadPlay_Pt[3]=GL_Quater_Point(Qt0,0,-4,0,0,0,1);
-	HeadPlay_Pt[4]=GL_Quater_Point(Qt0,0,4,0,0,0,1);
+	HeadPlay_Pt[1]=GL_Quater_Point(Qt0, 5,0,0, 1,0,0);
+	HeadPlay_Pt[2]=GL_Quater_Point(Qt0, -5,0,0, 1,0,0);
+	HeadPlay_Pt[3]=GL_Quater_Point(Qt0, 0,-4,0, 0,0,1);
+	HeadPlay_Pt[4]=GL_Quater_Point(Qt0, 0,4,0, 0,0,1);
 
 	//
-	HeadPlay_Pt[5]=GL_Quater_Point(Qt0,4,4,0,0,0.8,0);
-	HeadPlay_Pt[6]=GL_Quater_Point(Qt0,-4,4,0,0,0.8,0);
-	HeadPlay_Pt[7]=GL_Quater_Point(Qt0,4,-4,0,0.9,0.8,0);
-	HeadPlay_Pt[8]=GL_Quater_Point(Qt0,-4,-4,0,0.9,0.8,0);
+	HeadPlay_Pt[5]=GL_Quater_Point(Qt0, 4,4,0, 0,0.8,0);
+	HeadPlay_Pt[6]=GL_Quater_Point(Qt0, -4,4,0, 0,0.8,0);
+	HeadPlay_Pt[7]=GL_Quater_Point(Qt0, 4,-4,0, 0.9,0.8,0);
+	HeadPlay_Pt[8]=GL_Quater_Point(Qt0, -4,-4,0, 0.9,0.8,0);
 
 	//(0,0,z)点
 	HeadPlay_Pt[9]=GL_Quater_Point(Qt0, 0,0,-4, 0,0,0);
@@ -1046,7 +1046,7 @@ void GL_LineRays()
 			
 
 			float x0=-90;//直线上的点
-			float y0=52;
+			float y0=81;
 			float z0=0;
 
 			CV_Cross(frame_GL,LineRays[i],x0,y0,z0,CV_PointS[i],i);
@@ -1128,80 +1128,14 @@ void GLB_Knn(float Knn[][3],float a1,float b1,float c1,float a2,float b2,float c
 	Knn[num][1]=a2*a2+b2*b2+c2*c2;
 	Knn[num][2]=-2.0f*(a1*a2+b1*b2+c1*c2);
 }
-/***************************** 边长距离建模 *****************************/
-void GL_Energy()
+/***************************** 边长距离建模 最速迭代 *****************************/
+// DiguNum : 记录递归算法小循环
+// DiguCnt : 记录递归算法大循环 N*65535
+// Point_Check ：模式选择：算法点数
+void GL_Build_Steepest_M(int &Point_Check,int &DiguCnt,int &DiguNum )
 {
-	//-------------------------------- 测试梯度下降算法
-#if 0
-	int Ces=1;
-	if(Ces==0)
-	{
-		// y=x*x/2-2*x
-		// y偏导= x-2
-		float x=1;
-		float Nn=0.9;
-		float Ee=0;
-		for(int i=0;i<6;i++)
-		{
-			float Fx=x-2;
-			float xb=x-Nn*Fx;
-			Ee=-Nn*Fx;
-			x=xb;
-		}
-
-		printf("误差 = %f ,最优解 = %f \n",Ee,x);
-	}
-	if(Ces==1)
-	{
-		// f(x,y)=(x-7)*(x-7) + 2*(y-4)*(y-4)+3
-		// f的x偏导数 = 2*(x-7)/2
-		// f的y偏导数 = 4*(y-4)/2
-		float x=1,y=1;
-		float Nn=0.1;
-		float Eex=0,Eey=0;
-		for(int i=0;i<600;i++)
-		{
-			
-			float Fx=2*(x-7);
-			
-			float Fy=4*(y-4);
-
-			float xb=x-Nn*Fx;
-			float yb=y-Nn*Fy;
-
-			x=xb;
-			y=yb;
-
-			Eex=-Nn*Fx;
-			Eey=-Nn*Fy;
-
-			
-		}
-
-		//printf("误差xy = (%f, %f) ,最优解xy = (%f,%f) \n",Eex,Eey,x,y);
-	}
-#endif
-	//--------------------------------
-	float Edge=45*2;
-	GL_Point Pt0;
-	Pt0.x=-Edge;
-	Pt0.y=52;
-	Pt0.z=0;
-
-	float x0=Pt0.x;
-	float y0=Pt0.y;
-	float z0=Pt0.z;
-
-	//LineRays[];
-
-	// (x-x0)/a=(y-y0)/b=(z-z0)/c=t
-	// x=at+x0
-	// y=bt+y0
-	// z=ct+z0
-
-	//-----------
-	int Point_Check=4;//模式选择：算法点数
-	float dst_min=180*180*180; 
+	Point_Check=4;//模式选择：算法点数
+	
 	//-------------------
 	float t1=0,t2=0,t3=0,t4=0;
 	float Ft1,Ft2,Ft3,Ft4;
@@ -1212,124 +1146,112 @@ void GL_Energy()
 	{
 		nn==0.0021;
 	}
-	//-------------------------------------------------------------------------------------------------------
-	if(!Best_Flag && EnableX[0]&&EnableY[0] && EnableX[5]&&EnableY[5] && EnableX[4]&&EnableY[4]
-	    && EnableX[6]&&EnableY[6]
-	)
-	/*if(EnableX[0]&&EnableY[0] && EnableX[5]&&EnableY[5] && EnableX[4]&&EnableY[4]&& EnableX[6]&&EnableY[6]
-	   &&(New_FpsX[0]||New_FpsY[0]||New_FpsX[5]||New_FpsY[5]||New_FpsX[4]||New_FpsY[4]
-	     ||New_FpsX[6]||New_FpsY[6]
-	   )
-	)*/
-	{
-		//射线向量
-		float a1=LineRays[0].x; float b1=LineRays[0].y; float c1=LineRays[0].z;
-		float a2=LineRays[4].x; float b2=LineRays[4].y; float c2=LineRays[4].z;
-		float a3=LineRays[5].x; float b3=LineRays[5].y; float c3=LineRays[5].z;
-		float a4=LineRays[6].x; float b4=LineRays[6].y; float c4=LineRays[6].z;
-		//边长平方
-		float E12=16;// 1->2
-		float E22=16;// 2->3
-		float E32=32;// 1->3
-		float E42=32;// 1->4
-		float E52=16;// 2->4
-		float E62=64;// 3->4
-		//------构建模型系数
-		float knn[10][3];
-		GLB_Knn(knn,a1,b1,c1,a2,b2,c2,0);
-		GLB_Knn(knn,a2,b2,c2,a3,b3,c3,1);
-		GLB_Knn(knn,a1,b1,c1,a3,b3,c3,2);
+	//射线向量
+	float a1=LineRays[0].x; float b1=LineRays[0].y; float c1=LineRays[0].z;
+	float a2=LineRays[4].x; float b2=LineRays[4].y; float c2=LineRays[4].z;
+	float a3=LineRays[5].x; float b3=LineRays[5].y; float c3=LineRays[5].z;
+	float a4=LineRays[6].x; float b4=LineRays[6].y; float c4=LineRays[6].z;
+	//边长平方
+	float E12=16;// 1->2
+	float E22=16;// 2->3
+	float E32=32;// 1->3
+	float E42=32;// 1->4
+	float E52=16;// 2->4
+	float E62=64;// 3->4
+	//------构建模型系数
+	float knn[10][3];
+	GLB_Knn(knn,a1,b1,c1,a2,b2,c2,0);
+	GLB_Knn(knn,a2,b2,c2,a3,b3,c3,1);
+	GLB_Knn(knn,a1,b1,c1,a3,b3,c3,2);
 
-		GLB_Knn(knn,a1,b1,c1,a4,b4,c4,3);
-		GLB_Knn(knn,a2,b2,c2,a4,b4,c4,4);
-		GLB_Knn(knn,a3,b3,c3,a4,b4,c4,5);
+	GLB_Knn(knn,a1,b1,c1,a4,b4,c4,3);
+	GLB_Knn(knn,a2,b2,c2,a4,b4,c4,4);
+	GLB_Knn(knn,a3,b3,c3,a4,b4,c4,5);
 
-		// F(t1,t2,t3)=(knn[0][0]*t1*t1+knn[0][1]*t2*t2+knn[0][2]*t1*t2-E12)*(knn[0][0]*t1*t1+knn[0][1]*t2*t2+knn[0][2]*t1*t2-E12)
-		//            +(knn[1][0]*t2*t2+knn[1][1]*t3*t3+knn[1][2]*t2*t3-E22)*(knn[1][0]*t2*t2+knn[1][1]*t3*t3+knn[1][2]*t2*t3-E22)
-		//            +(knn[2][0]*t1*t1+knn[2][1]*t3*t3+knn[2][2]*t1*t3-E32)*(knn[2][0]*t1*t1+knn[2][1]*t3*t3+knn[2][2]*t1*t3-E32)
-		
-		//            +(knn[3][0]*t1*t1+knn[3][1]*t4*t4+knn[3][2]*t1*t4-E42)*(knn[3][0]*t1*t1+knn[3][1]*t4*t4+knn[3][2]*t1*t4-E42)
-		//            +(knn[4][0]*t2*t2+knn[4][1]*t4*t4+knn[4][2]*t2*t4-E52)*(knn[4][0]*t2*t2+knn[4][1]*t4*t4+knn[4][2]*t2*t4-E52)
-		//            +(knn[5][0]*t3*t3+knn[5][1]*t4*t4+knn[5][2]*t3*t4-E62)*(knn[5][0]*t3*t3+knn[5][1]*t4*t4+knn[5][2]*t3*t4-E62)
-		
-		//-----------------
-		// F(t1,t2,t3)/t1偏导数=(knn[0][0]*t1*t1+knn[0][1]*t2*t2+knn[0][2]*t1*t2-E12)*(2*knn[0][0]*t1+knn[0][2]*t2)
-		//                     +(knn[2][0]*t1*t1+knn[2][1]*t3*t3+knn[2][2]*t1*t3-E32)*(2*knn[2][0]*t1+knn[2][2]*t3)
-		//                     +(knn[3][0]*t1*t1+knn[3][1]*t4*t4+knn[3][2]*t1*t4-E42)*(2*knn[3][0]*t1+knn[3][2]*t4)
+	// F(t1,t2,t3)=(knn[0][0]*t1*t1+knn[0][1]*t2*t2+knn[0][2]*t1*t2-E12)*(knn[0][0]*t1*t1+knn[0][1]*t2*t2+knn[0][2]*t1*t2-E12)
+	//            +(knn[1][0]*t2*t2+knn[1][1]*t3*t3+knn[1][2]*t2*t3-E22)*(knn[1][0]*t2*t2+knn[1][1]*t3*t3+knn[1][2]*t2*t3-E22)
+	//            +(knn[2][0]*t1*t1+knn[2][1]*t3*t3+knn[2][2]*t1*t3-E32)*(knn[2][0]*t1*t1+knn[2][1]*t3*t3+knn[2][2]*t1*t3-E32)
 
-		// F(t1,t2,t3)/t2偏导数=(knn[0][0]*t1*t1+knn[0][1]*t2*t2+knn[0][2]*t1*t2-E12)*(2*knn[0][1]*t2+knn[0][2]*t1)
-		//                     +(knn[1][0]*t2*t2+knn[1][1]*t3*t3+knn[1][2]*t2*t3-E22)*(2*knn[1][0]*t2+knn[1][2]*t3)
-		//                     +(knn[4][0]*t2*t2+knn[4][1]*t4*t4+knn[4][2]*t2*t4-E52)*(2*knn[4][0]*t2+knn[4][2]*t4)
+	//            +(knn[3][0]*t1*t1+knn[3][1]*t4*t4+knn[3][2]*t1*t4-E42)*(knn[3][0]*t1*t1+knn[3][1]*t4*t4+knn[3][2]*t1*t4-E42)
+	//            +(knn[4][0]*t2*t2+knn[4][1]*t4*t4+knn[4][2]*t2*t4-E52)*(knn[4][0]*t2*t2+knn[4][1]*t4*t4+knn[4][2]*t2*t4-E52)
+	//            +(knn[5][0]*t3*t3+knn[5][1]*t4*t4+knn[5][2]*t3*t4-E62)*(knn[5][0]*t3*t3+knn[5][1]*t4*t4+knn[5][2]*t3*t4-E62)
 
-		// F(t1,t2,t3)/t3偏导数=(knn[1][0]*t2*t2+knn[1][1]*t3*t3+knn[1][2]*t2*t3-E22)*(2*knn[1][1]*t3+knn[1][2]*t2)
-		//                     +(knn[2][0]*t1*t1+knn[2][1]*t3*t3+knn[2][2]*t1*t3-E32)*(2*knn[2][1]*t3+knn[2][2]*t1)
-		//                     +(knn[5][0]*t3*t3+knn[5][1]*t4*t4+knn[5][2]*t3*t4-E62)*(2*knn[5][0]*t3+knn[5][2]*t4)
+	//-----------------
+	// F(t1,t2,t3)/t1偏导数=(knn[0][0]*t1*t1+knn[0][1]*t2*t2+knn[0][2]*t1*t2-E12)*(2*knn[0][0]*t1+knn[0][2]*t2)
+	//                     +(knn[2][0]*t1*t1+knn[2][1]*t3*t3+knn[2][2]*t1*t3-E32)*(2*knn[2][0]*t1+knn[2][2]*t3)
+	//                     +(knn[3][0]*t1*t1+knn[3][1]*t4*t4+knn[3][2]*t1*t4-E42)*(2*knn[3][0]*t1+knn[3][2]*t4)
 
-		// F(t1,t2,t3)/t4偏导数=(knn[3][0]*t1*t1+knn[3][1]*t4*t4+knn[3][2]*t1*t4-E42)*(2*knn[3][1]*t4+knn[3][2]*t1)
-		//                     +(knn[4][0]*t2*t2+knn[4][1]*t4*t4+knn[4][2]*t2*t4-E52)*(2*knn[4][1]*t4+knn[4][2]*t2)
-		//                     +(knn[5][0]*t3*t3+knn[5][1]*t4*t4+knn[5][2]*t3*t4-E62)*(2*knn[5][1]*t4+knn[5][2]*t3)
+	// F(t1,t2,t3)/t2偏导数=(knn[0][0]*t1*t1+knn[0][1]*t2*t2+knn[0][2]*t1*t2-E12)*(2*knn[0][1]*t2+knn[0][2]*t1)
+	//                     +(knn[1][0]*t2*t2+knn[1][1]*t3*t3+knn[1][2]*t2*t3-E22)*(2*knn[1][0]*t2+knn[1][2]*t3)
+	//                     +(knn[4][0]*t2*t2+knn[4][1]*t4*t4+knn[4][2]*t2*t4-E52)*(2*knn[4][0]*t2+knn[4][2]*t4)
 
-		//-------角度约束
-		//GL_Vector Line1_V;// 0->1
-		//Line1_V.x=a1*t1-a2*t2;
-		//Line1_V.y=b1*t1-b2*t2;
-		//Line1_V.z=c1*t1-c2*t2;
+	// F(t1,t2,t3)/t3偏导数=(knn[1][0]*t2*t2+knn[1][1]*t3*t3+knn[1][2]*t2*t3-E22)*(2*knn[1][1]*t3+knn[1][2]*t2)
+	//                     +(knn[2][0]*t1*t1+knn[2][1]*t3*t3+knn[2][2]*t1*t3-E32)*(2*knn[2][1]*t3+knn[2][2]*t1)
+	//                     +(knn[5][0]*t3*t3+knn[5][1]*t4*t4+knn[5][2]*t3*t4-E62)*(2*knn[5][0]*t3+knn[5][2]*t4)
 
-		//GL_Vector Line2_V;// 2->3
-		//Line1_V.x=a3*t3-a2*t2;
-		//Line1_V.y=b3*t3-b2*t2;
-		//Line1_V.z=c3*t3-c2*t2;
+	// F(t1,t2,t3)/t4偏导数=(knn[3][0]*t1*t1+knn[3][1]*t4*t4+knn[3][2]*t1*t4-E42)*(2*knn[3][1]*t4+knn[3][2]*t1)
+	//                     +(knn[4][0]*t2*t2+knn[4][1]*t4*t4+knn[4][2]*t2*t4-E52)*(2*knn[4][1]*t4+knn[4][2]*t2)
+	//                     +(knn[5][0]*t3*t3+knn[5][1]*t4*t4+knn[5][2]*t3*t4-E62)*(2*knn[5][1]*t4+knn[5][2]*t3)
 
-		// 角度约束函数 0->1 2->3 夹角：F_Angle1=( (a1*t1-a2*t2)*(a3*t3-a2*t2) + (b1*t1-b2*t2)*(b3*t3-b2*t2) + (c1*t1-c2*t2)*(c3*t3-c2*t2) )
-		//                      *( (a1*t1-a2*t2)*(a3*t3-a2*t2) + (b1*t1-b2*t2)*(b3*t3-b2*t2) + (c1*t1-c2*t2)*(c3*t3-c2*t2) )
-		
+	//-------角度约束
+	//GL_Vector Line1_V;// 0->1
+	//Line1_V.x=a1*t1-a2*t2;
+	//Line1_V.y=b1*t1-b2*t2;
+	//Line1_V.z=c1*t1-c2*t2;
 
-		// F_Angle/t1偏导数=2*( (a1*t1-a2*t2)*(a3*t3-a2*t2) + (b1*t1-b2*t2)*(b3*t3-b2*t2) + (c1*t1-c2*t2)*(c3*t3-c2*t2) )
-		//                 *( (a1)*(a3*t3-a2*t2) + (b1)*(b3*t3-b2*t2) + (c1)*(c3*t3-c2*t2) )
+	//GL_Vector Line2_V;// 2->3
+	//Line1_V.x=a3*t3-a2*t2;
+	//Line1_V.y=b3*t3-b2*t2;
+	//Line1_V.z=c3*t3-c2*t2;
 
-		// F_Angle/t2偏导数=2*( (a1*t1-a2*t2)*(a3*t3-a2*t2) + (b1*t1-b2*t2)*(b3*t3-b2*t2) + (c1*t1-c2*t2)*(c3*t3-c2*t2) )
-		//                 *( (-a2)*(a3*t3-a2*t2)+ (a1*t1-a2*t2)*(-a2) + (-b2)*(b3*t3-b2*t2)+(b1*t1-b2*t2)*(-b2) + (-c2)*(c3*t3-c2*t2) +(c1*t1-c2*t2)*(-c2) )
-
-		// F_Angle/t3偏导数=2*( (a1*t1-a2*t2)*(a3*t3-a2*t2) + (b1*t1-b2*t2)*(b3*t3-b2*t2) + (c1*t1-c2*t2)*(c3*t3-c2*t2) )
-		//                 *( (a1*t1-a2*t2)*(a3) + (b1*t1-b2*t2)*(b3) + (c1*t1-c2*t2)*(c3) )
-		//---------------------------------------------------------------------------------------------------------------------
-		// 角度约束函数 0->1 2->4 夹角：F_Angle2=( (a1*t1-a2*t2)*(a4*t4-a2*t2) + (b1*t1-b2*t2)*(b4*t4-b2*t2) + (c1*t1-c2*t2)*(c4*t4-c2*t2) )
-		//                      *( (a1*t1-a2*t2)*(a4*t4-a2*t2) + (b1*t1-b2*t2)*(b4*t4-b2*t2) + (c1*t1-c2*t2)*(c4*t4-c2*t2) )
+	// 角度约束函数 0->1 2->3 夹角：F_Angle1=( (a1*t1-a2*t2)*(a3*t3-a2*t2) + (b1*t1-b2*t2)*(b3*t3-b2*t2) + (c1*t1-c2*t2)*(c3*t3-c2*t2) )
+	//                      *( (a1*t1-a2*t2)*(a3*t3-a2*t2) + (b1*t1-b2*t2)*(b3*t3-b2*t2) + (c1*t1-c2*t2)*(c3*t3-c2*t2) )
 
 
-		// F_Angle/t1偏导数=2*( (a1*t1-a2*t2)*(a4*t4-a2*t2) + (b1*t1-b2*t2)*(b4*t4-b2*t2) + (c1*t1-c2*t2)*(c4*t4-c2*t2) )
-		//                 *( (a1)*(a4*t4-a2*t2) + (b1)*(b4*t4-b2*t2) + (c1)*(c4*t4-c2*t2) )
+	// F_Angle/t1偏导数=2*( (a1*t1-a2*t2)*(a3*t3-a2*t2) + (b1*t1-b2*t2)*(b3*t3-b2*t2) + (c1*t1-c2*t2)*(c3*t3-c2*t2) )
+	//                 *( (a1)*(a3*t3-a2*t2) + (b1)*(b3*t3-b2*t2) + (c1)*(c3*t3-c2*t2) )
 
-		// F_Angle/t2偏导数=2*( (a1*t1-a2*t2)*(a4*t4-a2*t2) + (b1*t1-b2*t2)*(b4*t4-b2*t2) + (c1*t1-c2*t2)*(c4*t4-c2*t2) )
-		//                 *( (-a2)*(a4*t4-a2*t2)+ (a1*t1-a2*t2)*(-a2) + (-b2)*(b4*t4-b2*t2)+(b1*t1-b2*t2)*(-b2) + (-c2)*(c4*t4-c2*t2) +(c1*t1-c2*t2)*(-c2) )
+	// F_Angle/t2偏导数=2*( (a1*t1-a2*t2)*(a3*t3-a2*t2) + (b1*t1-b2*t2)*(b3*t3-b2*t2) + (c1*t1-c2*t2)*(c3*t3-c2*t2) )
+	//                 *( (-a2)*(a3*t3-a2*t2)+ (a1*t1-a2*t2)*(-a2) + (-b2)*(b3*t3-b2*t2)+(b1*t1-b2*t2)*(-b2) + (-c2)*(c3*t3-c2*t2) +(c1*t1-c2*t2)*(-c2) )
 
-		// F_Angle/t4偏导数=2*( (a1*t1-a2*t2)*(a4*t4-a2*t2) + (b1*t1-b2*t2)*(b4*t4-b2*t2) + (c1*t1-c2*t2)*(c4*t4-c2*t2) )
-		//                 *( (a1*t1-a2*t2)*(a4) + (b1*t1-b2*t2)*(b4) + (c1*t1-c2*t2)*(c4) )
+	// F_Angle/t3偏导数=2*( (a1*t1-a2*t2)*(a3*t3-a2*t2) + (b1*t1-b2*t2)*(b3*t3-b2*t2) + (c1*t1-c2*t2)*(c3*t3-c2*t2) )
+	//                 *( (a1*t1-a2*t2)*(a3) + (b1*t1-b2*t2)*(b3) + (c1*t1-c2*t2)*(c3) )
+	//---------------------------------------------------------------------------------------------------------------------
+	// 角度约束函数 0->1 2->4 夹角：F_Angle2=( (a1*t1-a2*t2)*(a4*t4-a2*t2) + (b1*t1-b2*t2)*(b4*t4-b2*t2) + (c1*t1-c2*t2)*(c4*t4-c2*t2) )
+	//                      *( (a1*t1-a2*t2)*(a4*t4-a2*t2) + (b1*t1-b2*t2)*(b4*t4-b2*t2) + (c1*t1-c2*t2)*(c4*t4-c2*t2) )
 
-		
-		 //if(Step_Recursion<3)//初始前几次递归步长较大之后步长变小。
-		 //{
-			// Step_Recursion++;
-			// nn=0.002999;
-		 //}
-		 //-------------------
-		 
-		 //	{
-		 //		//fprintf(file,"(%d,%d,%d) (%f,%f,%f) (%d,%d,%d)\n",G_ax,G_ay,G_az,Rotx,Roty,Rotz,Compass_X,Compass_Y,Compass_Z);
-		 //		
-		 //	}
-		 
-		 long start_time=clock();//Cpu测试算法时间 起始：
-		 int DiguNum=0;//记录递归算法小循环
-		 int DiguCnt=0;//记录递归算法大循环 N*65535
-		 int i=0;
-		 //-------------------------------------------------递归算法 Start
-		 while(DiguCnt==0 ||(DiguCnt!=0 && DiguNum==65535))
+
+	// F_Angle/t1偏导数=2*( (a1*t1-a2*t2)*(a4*t4-a2*t2) + (b1*t1-b2*t2)*(b4*t4-b2*t2) + (c1*t1-c2*t2)*(c4*t4-c2*t2) )
+	//                 *( (a1)*(a4*t4-a2*t2) + (b1)*(b4*t4-b2*t2) + (c1)*(c4*t4-c2*t2) )
+
+	// F_Angle/t2偏导数=2*( (a1*t1-a2*t2)*(a4*t4-a2*t2) + (b1*t1-b2*t2)*(b4*t4-b2*t2) + (c1*t1-c2*t2)*(c4*t4-c2*t2) )
+	//                 *( (-a2)*(a4*t4-a2*t2)+ (a1*t1-a2*t2)*(-a2) + (-b2)*(b4*t4-b2*t2)+(b1*t1-b2*t2)*(-b2) + (-c2)*(c4*t4-c2*t2) +(c1*t1-c2*t2)*(-c2) )
+
+	// F_Angle/t4偏导数=2*( (a1*t1-a2*t2)*(a4*t4-a2*t2) + (b1*t1-b2*t2)*(b4*t4-b2*t2) + (c1*t1-c2*t2)*(c4*t4-c2*t2) )
+	//                 *( (a1*t1-a2*t2)*(a4) + (b1*t1-b2*t2)*(b4) + (c1*t1-c2*t2)*(c4) )
+
+
+	//if(Step_Recursion<3)//初始前几次递归步长较大之后步长变小。
+	//{
+	// Step_Recursion++;
+	// nn=0.002999;
+	//}
+	//-------------------
+
+	//	{
+	//		//fprintf(file,"(%d,%d,%d) (%f,%f,%f) (%d,%d,%d)\n",G_ax,G_ay,G_az,Rotx,Roty,Rotz,Compass_X,Compass_Y,Compass_Z);
+	//		
+	//	}
+
+	
+	//-------------------------------------------------------------
+	 while(DiguCnt==0 ||(DiguCnt!=0 && DiguNum==65535))
 		 {
 			 /*if(DiguCnt>15)nn=0.000023;*/
 			 if(DiguCnt>18)break;
 			 DiguNum=0;
 			 DiguCnt++;
+			 int i=0;
 		 for( i=0;i<65535;i++)
 		 {
 #if 0
@@ -1419,6 +1341,7 @@ void GL_Energy()
 			 if(Point_Check==4)
 			 {
 				 if(t1==t1b && t2==t2b && t3==t3b &&t4==t4b) break;
+				 //if(ABS(t1-t1b)<0.000005 && ABS(t2-t2b)<0.000005 && ABS(t3-t3b)<0.000005 && ABS(t4-t4b)<0.000005) break;
 			 }
 			 else if(Point_Check==3)
 			 {
@@ -1433,13 +1356,17 @@ void GL_Energy()
 			 t2=t2b;
 			 t3=t3b;
 			 t4=t4b;
-			 //printf("t1t2t3 = %f,%f,%f\n",t1,t2,t3);
 		 }
-		 DiguNum=i;
+			DiguNum=i;
 		 }
 
-		 //-------------------------------------------------递归算法 Finsh
-		 //---------------------------------------------------
+		 //将递归结果返回全局变量保存
+		 t1_Global=t1;
+		 t2_Global=t2;
+		 t3_Global=t3;
+		 t4_Global=t4;
+
+		  //---------------------------------------------------
 		 //nn=0.00001581;
 		 //t1-=0.001;
 		 //t2-=0.001;
@@ -1558,7 +1485,455 @@ void GL_Energy()
 			//	 }
 			// }
 		 //}
-		 //-------------------------------------------
+}
+
+/***************************** 边长距离建模 最速迭代 *****************************/
+// DiguNum : 记录递归算法小循环
+// DiguCnt : 记录递归算法大循环 N*65535
+// Point_Check ：模式选择：算法点数
+void GL_Build_Steepest_M5Point(int &Point_Check,int &DiguCnt,int &DiguNum )
+{
+	Point_Check=5;//模式选择：算法点数
+	//-------------------
+	float t1=0,t2=0,t3=0,t4=0,t5=0;
+	float Ft1,Ft2,Ft3,Ft4,Ft5;
+	t1=t1_Global;t2=t2_Global;t3=t3_Global;t4=t4_Global,t5=t5_Global;
+	float t1b=100,t2b=100,t3b=100,t4b=100,t5b=100;
+	float nn=0.001071;// 递归步长 适中（不能太大也不能太小）。
+
+	//射线向量
+	float a1=LineRays[0].x; float b1=LineRays[0].y; float c1=LineRays[0].z;
+	float a2=LineRays[4].x; float b2=LineRays[4].y; float c2=LineRays[4].z;
+	float a3=LineRays[5].x; float b3=LineRays[5].y; float c3=LineRays[5].z;
+	float a4=LineRays[6].x; float b4=LineRays[6].y; float c4=LineRays[6].z;
+
+	float a5=LineRays[1].x; float b5=LineRays[1].y; float c5=LineRays[1].z;
+	//边长平方
+	float E12=16;// 1->2
+	float E22=16;// 2->3
+	float E32=32;// 1->3
+	float E42=32;// 1->4
+	float E52=16;// 2->4
+	float E62=64;// 3->4
+	
+	float E72=25;// 1->5
+	float E82=41;// 2->5
+	float E92=17;// 3->5
+	float EA2=97;// 4_>5
+	//------构建模型系数
+	float knn[10][3];
+	GLB_Knn(knn,a1,b1,c1,a2,b2,c2,0);
+	GLB_Knn(knn,a2,b2,c2,a3,b3,c3,1);
+	GLB_Knn(knn,a1,b1,c1,a3,b3,c3,2);
+
+	GLB_Knn(knn,a1,b1,c1,a4,b4,c4,3);
+	GLB_Knn(knn,a2,b2,c2,a4,b4,c4,4);
+	GLB_Knn(knn,a3,b3,c3,a4,b4,c4,5);
+
+	GLB_Knn(knn,a1,b1,c1,a5,b5,c5,6);
+	GLB_Knn(knn,a2,b2,c2,a5,b5,c5,7);
+	GLB_Knn(knn,a3,b3,c3,a5,b5,c5,8);
+	GLB_Knn(knn,a4,b4,c4,a5,b5,c5,9);
+
+
+	// F(t1,t2,t3)=(knn[0][0]*t1*t1+knn[0][1]*t2*t2+knn[0][2]*t1*t2-E12)*(knn[0][0]*t1*t1+knn[0][1]*t2*t2+knn[0][2]*t1*t2-E12)
+	//            +(knn[1][0]*t2*t2+knn[1][1]*t3*t3+knn[1][2]*t2*t3-E22)*(knn[1][0]*t2*t2+knn[1][1]*t3*t3+knn[1][2]*t2*t3-E22)
+	//            +(knn[2][0]*t1*t1+knn[2][1]*t3*t3+knn[2][2]*t1*t3-E32)*(knn[2][0]*t1*t1+knn[2][1]*t3*t3+knn[2][2]*t1*t3-E32)
+
+	//            +(knn[3][0]*t1*t1+knn[3][1]*t4*t4+knn[3][2]*t1*t4-E42)*(knn[3][0]*t1*t1+knn[3][1]*t4*t4+knn[3][2]*t1*t4-E42)
+	//            +(knn[4][0]*t2*t2+knn[4][1]*t4*t4+knn[4][2]*t2*t4-E52)*(knn[4][0]*t2*t2+knn[4][1]*t4*t4+knn[4][2]*t2*t4-E52)
+	//            +(knn[5][0]*t3*t3+knn[5][1]*t4*t4+knn[5][2]*t3*t4-E62)*(knn[5][0]*t3*t3+knn[5][1]*t4*t4+knn[5][2]*t3*t4-E62)
+	
+	//            +(knn[6][0]*t1*t1+knn[6][1]*t5*t5+knn[6][2]*t1*t5-E72)*(knn[6][0]*t1*t1+knn[6][1]*t5*t5+knn[6][2]*t1*t5-E72)
+	//            +(knn[7][0]*t2*t2+knn[7][1]*t5*t5+knn[7][2]*t2*t5-E82)*(knn[7][0]*t2*t2+knn[7][1]*t5*t5+knn[7][2]*t2*t5-E82)
+	//            +(knn[8][0]*t3*t3+knn[8][1]*t5*t5+knn[8][2]*t3*t5-E92)*(knn[8][0]*t3*t3+knn[8][1]*t5*t5+knn[8][2]*t3*t5-E92)
+	//            +(knn[9][0]*t4*t4+knn[9][1]*t5*t5+knn[9][2]*t4*t5-EA2)*(knn[9][0]*t4*t4+knn[9][1]*t5*t5+knn[9][2]*t4*t5-EA2)
+
+	//-----------------
+	// F(t1,t2,t3)/t1偏导数=(knn[0][0]*t1*t1+knn[0][1]*t2*t2+knn[0][2]*t1*t2-E12)*(2*knn[0][0]*t1+knn[0][2]*t2)
+	//                     +(knn[2][0]*t1*t1+knn[2][1]*t3*t3+knn[2][2]*t1*t3-E32)*(2*knn[2][0]*t1+knn[2][2]*t3)
+	//                     +(knn[3][0]*t1*t1+knn[3][1]*t4*t4+knn[3][2]*t1*t4-E42)*(2*knn[3][0]*t1+knn[3][2]*t4)
+	//                     +(knn[6][0]*t1*t1+knn[6][1]*t5*t5+knn[6][2]*t1*t5-E72)*(2*knn[6][0]*t1+knn[6][2]*t5)
+
+	// F(t1,t2,t3)/t2偏导数=(knn[0][0]*t1*t1+knn[0][1]*t2*t2+knn[0][2]*t1*t2-E12)*(2*knn[0][1]*t2+knn[0][2]*t1)
+	//                     +(knn[1][0]*t2*t2+knn[1][1]*t3*t3+knn[1][2]*t2*t3-E22)*(2*knn[1][0]*t2+knn[1][2]*t3)
+	//                     +(knn[4][0]*t2*t2+knn[4][1]*t4*t4+knn[4][2]*t2*t4-E52)*(2*knn[4][0]*t2+knn[4][2]*t4)
+	//                     +(knn[7][0]*t2*t2+knn[7][1]*t5*t5+knn[7][2]*t2*t5-E82)*(2*knn[7][0]*t2+knn[7][2]*t5)
+
+	// F(t1,t2,t3)/t3偏导数=(knn[1][0]*t2*t2+knn[1][1]*t3*t3+knn[1][2]*t2*t3-E22)*(2*knn[1][1]*t3+knn[1][2]*t2)
+	//                     +(knn[2][0]*t1*t1+knn[2][1]*t3*t3+knn[2][2]*t1*t3-E32)*(2*knn[2][1]*t3+knn[2][2]*t1)
+	//                     +(knn[5][0]*t3*t3+knn[5][1]*t4*t4+knn[5][2]*t3*t4-E62)*(2*knn[5][0]*t3+knn[5][2]*t4)
+	//                     +(knn[8][0]*t3*t3+knn[8][1]*t5*t5+knn[8][2]*t3*t5-E92)*(2*knn[8][0]*t3+knn[8][2]*t5)
+
+	// F(t1,t2,t3)/t4偏导数=(knn[3][0]*t1*t1+knn[3][1]*t4*t4+knn[3][2]*t1*t4-E42)*(2*knn[3][1]*t4+knn[3][2]*t1)
+	//                     +(knn[4][0]*t2*t2+knn[4][1]*t4*t4+knn[4][2]*t2*t4-E52)*(2*knn[4][1]*t4+knn[4][2]*t2)
+	//                     +(knn[5][0]*t3*t3+knn[5][1]*t4*t4+knn[5][2]*t3*t4-E62)*(2*knn[5][1]*t4+knn[5][2]*t3)
+	//                     +(knn[9][0]*t4*t4+knn[9][1]*t5*t5+knn[9][2]*t4*t5-EA2)*(2*knn[9][0]*t4+knn[9][2]*t5)
+
+	// F(t1,t2,t3)/t5偏导数=(knn[6][0]*t1*t1+knn[6][1]*t5*t5+knn[6][2]*t1*t5-E72)*(2*knn[6][1]*t5+knn[6][2]*t1)
+	//                     +(knn[7][0]*t2*t2+knn[7][1]*t5*t5+knn[7][2]*t2*t5-E82)*(2*knn[7][1]*t5+knn[7][2]*t2)
+	//                     +(knn[8][0]*t3*t3+knn[8][1]*t5*t5+knn[8][2]*t3*t5-E92)*(2*knn[8][1]*t5+knn[8][2]*t3)
+	//                     +(knn[9][0]*t4*t4+knn[9][1]*t5*t5+knn[9][2]*t4*t5-EA2)*(2*knn[9][1]*t5+knn[9][2]*t4)
+
+	//-------角度约束
+	//GL_Vector Line1_V;// 0->1
+	//Line1_V.x=a1*t1-a2*t2;
+	//Line1_V.y=b1*t1-b2*t2;
+	//Line1_V.z=c1*t1-c2*t2;
+
+	//GL_Vector Line2_V;// 2->3
+	//Line1_V.x=a3*t3-a2*t2;
+	//Line1_V.y=b3*t3-b2*t2;
+	//Line1_V.z=c3*t3-c2*t2;
+
+	// 角度约束函数 0->1 2->3 夹角：F_Angle1=( (a1*t1-a2*t2)*(a3*t3-a2*t2) + (b1*t1-b2*t2)*(b3*t3-b2*t2) + (c1*t1-c2*t2)*(c3*t3-c2*t2) )
+	//                      *( (a1*t1-a2*t2)*(a3*t3-a2*t2) + (b1*t1-b2*t2)*(b3*t3-b2*t2) + (c1*t1-c2*t2)*(c3*t3-c2*t2) )
+
+
+	// F_Angle/t1偏导数=2*( (a1*t1-a2*t2)*(a3*t3-a2*t2) + (b1*t1-b2*t2)*(b3*t3-b2*t2) + (c1*t1-c2*t2)*(c3*t3-c2*t2) )
+	//                 *( (a1)*(a3*t3-a2*t2) + (b1)*(b3*t3-b2*t2) + (c1)*(c3*t3-c2*t2) )
+
+	// F_Angle/t2偏导数=2*( (a1*t1-a2*t2)*(a3*t3-a2*t2) + (b1*t1-b2*t2)*(b3*t3-b2*t2) + (c1*t1-c2*t2)*(c3*t3-c2*t2) )
+	//                 *( (-a2)*(a3*t3-a2*t2)+ (a1*t1-a2*t2)*(-a2) + (-b2)*(b3*t3-b2*t2)+(b1*t1-b2*t2)*(-b2) + (-c2)*(c3*t3-c2*t2) +(c1*t1-c2*t2)*(-c2) )
+
+	// F_Angle/t3偏导数=2*( (a1*t1-a2*t2)*(a3*t3-a2*t2) + (b1*t1-b2*t2)*(b3*t3-b2*t2) + (c1*t1-c2*t2)*(c3*t3-c2*t2) )
+	//                 *( (a1*t1-a2*t2)*(a3) + (b1*t1-b2*t2)*(b3) + (c1*t1-c2*t2)*(c3) )
+	//---------------------------------------------------------------------------------------------------------------------
+	// 角度约束函数 0->1 2->4 夹角：F_Angle2=( (a1*t1-a2*t2)*(a4*t4-a2*t2) + (b1*t1-b2*t2)*(b4*t4-b2*t2) + (c1*t1-c2*t2)*(c4*t4-c2*t2) )
+	//                      *( (a1*t1-a2*t2)*(a4*t4-a2*t2) + (b1*t1-b2*t2)*(b4*t4-b2*t2) + (c1*t1-c2*t2)*(c4*t4-c2*t2) )
+
+
+	// F_Angle/t1偏导数=2*( (a1*t1-a2*t2)*(a4*t4-a2*t2) + (b1*t1-b2*t2)*(b4*t4-b2*t2) + (c1*t1-c2*t2)*(c4*t4-c2*t2) )
+	//                 *( (a1)*(a4*t4-a2*t2) + (b1)*(b4*t4-b2*t2) + (c1)*(c4*t4-c2*t2) )
+
+	// F_Angle/t2偏导数=2*( (a1*t1-a2*t2)*(a4*t4-a2*t2) + (b1*t1-b2*t2)*(b4*t4-b2*t2) + (c1*t1-c2*t2)*(c4*t4-c2*t2) )
+	//                 *( (-a2)*(a4*t4-a2*t2)+ (a1*t1-a2*t2)*(-a2) + (-b2)*(b4*t4-b2*t2)+(b1*t1-b2*t2)*(-b2) + (-c2)*(c4*t4-c2*t2) +(c1*t1-c2*t2)*(-c2) )
+
+	// F_Angle/t4偏导数=2*( (a1*t1-a2*t2)*(a4*t4-a2*t2) + (b1*t1-b2*t2)*(b4*t4-b2*t2) + (c1*t1-c2*t2)*(c4*t4-c2*t2) )
+	//                 *( (a1*t1-a2*t2)*(a4) + (b1*t1-b2*t2)*(b4) + (c1*t1-c2*t2)*(c4) )
+
+
+	//if(Step_Recursion<3)//初始前几次递归步长较大之后步长变小。
+	//{
+	// Step_Recursion++;
+	// nn=0.002999;
+	//}
+	//-------------------
+
+	//	{
+	//		//fprintf(file,"(%d,%d,%d) (%f,%f,%f) (%d,%d,%d)\n",G_ax,G_ay,G_az,Rotx,Roty,Rotz,Compass_X,Compass_Y,Compass_Z);
+	//		
+	//	}
+
+	
+	//-------------------------------------------------------------
+	 while(DiguCnt==0 ||(DiguCnt!=0 && DiguNum==65535))
+		 {
+			 /*if(DiguCnt>15)nn=0.000023;*/
+			 if(DiguCnt>18)break;
+			 DiguNum=0;
+			 DiguCnt++;
+			 int i=0;
+		 for( i=0;i<65535;i++)
+		 {
+#if 0
+			 if(i<25000)
+			 {
+				 nn=0.0008999;
+			 }
+			
+			 else if(i>=25000 && i<52000)
+			 {
+				 nn=0.00068531;
+			 }
+			  else 
+			 {
+				  nn=0.00002;
+			 }
+#endif
+
+			 
+			 if(Point_Check==5)//四点递归
+			 {
+			  Ft1=(knn[0][0]*t1*t1+knn[0][1]*t2*t2+knn[0][2]*t1*t2-E12)*(2*knn[0][0]*t1+knn[0][2]*t2)
+			                      +(knn[2][0]*t1*t1+knn[2][1]*t3*t3+knn[2][2]*t1*t3-E32)*(2*knn[2][0]*t1+knn[2][2]*t3)
+			                      +(knn[3][0]*t1*t1+knn[3][1]*t4*t4+knn[3][2]*t1*t4-E42)*(2*knn[3][0]*t1+knn[3][2]*t4)
+								  +10*( (a1*t1-a2*t2)*(a3*t3-a2*t2) + (b1*t1-b2*t2)*(b3*t3-b2*t2) + (c1*t1-c2*t2)*(c3*t3-c2*t2) )
+								  *( (a1)*(a3*t3-a2*t2) + (b1)*(b3*t3-b2*t2) + (c1)*(c3*t3-c2*t2) )
+								  /*+10*( (a1*t1-a2*t2)*(a4*t4-a2*t2) + (b1*t1-b2*t2)*(b4*t4-b2*t2) + (c1*t1-c2*t2)*(c4*t4-c2*t2) )
+								   *( (a1)*(a4*t4-a2*t2) + (b1)*(b4*t4-b2*t2) + (c1)*(c4*t4-c2*t2) )*/
+								   +(knn[6][0]*t1*t1+knn[6][1]*t5*t5+knn[6][2]*t1*t5-E72)*(2*knn[6][0]*t1+knn[6][2]*t5)
+								  ;
+
+			  Ft2=(knn[0][0]*t1*t1+knn[0][1]*t2*t2+knn[0][2]*t1*t2-E12)*(2*knn[0][1]*t2+knn[0][2]*t1)
+			                      +(knn[1][0]*t2*t2+knn[1][1]*t3*t3+knn[1][2]*t2*t3-E22)*(2*knn[1][0]*t2+knn[1][2]*t3)
+			                      +(knn[4][0]*t2*t2+knn[4][1]*t4*t4+knn[4][2]*t2*t4-E52)*(2*knn[4][0]*t2+knn[4][2]*t4)
+								  +10*( (a1*t1-a2*t2)*(a3*t3-a2*t2) + (b1*t1-b2*t2)*(b3*t3-b2*t2) + (c1*t1-c2*t2)*(c3*t3-c2*t2) )
+								  *( (-a2)*(a3*t3-a2*t2)+ (a1*t1-a2*t2)*(-a2) + (-b2)*(b3*t3-b2*t2)+(b1*t1-b2*t2)*(-b2) + (-c2)*(c3*t3-c2*t2) +(c1*t1-c2*t2)*(-c2) )
+								  /*+10*( (a1*t1-a2*t2)*(a4*t4-a2*t2) + (b1*t1-b2*t2)*(b4*t4-b2*t2) + (c1*t1-c2*t2)*(c4*t4-c2*t2) )
+				                  *( (-a2)*(a4*t4-a2*t2)+ (a1*t1-a2*t2)*(-a2) + (-b2)*(b4*t4-b2*t2)+(b1*t1-b2*t2)*(-b2) + (-c2)*(c4*t4-c2*t2) +(c1*t1-c2*t2)*(-c2) )*/
+								  +(knn[7][0]*t2*t2+knn[7][1]*t5*t5+knn[7][2]*t2*t5-E82)*(2*knn[7][0]*t2+knn[7][2]*t5)
+								  ;
+
+			  Ft3=(knn[1][0]*t2*t2+knn[1][1]*t3*t3+knn[1][2]*t2*t3-E22)*(2*knn[1][1]*t3+knn[1][2]*t2)
+			                      +(knn[2][0]*t1*t1+knn[2][1]*t3*t3+knn[2][2]*t1*t3-E32)*(2*knn[2][1]*t3+knn[2][2]*t1)
+			                      +(knn[5][0]*t3*t3+knn[5][1]*t4*t4+knn[5][2]*t3*t4-E62)*(2*knn[5][0]*t3+knn[5][2]*t4)
+								  +10*( (a1*t1-a2*t2)*(a3*t3-a2*t2) + (b1*t1-b2*t2)*(b3*t3-b2*t2) + (c1*t1-c2*t2)*(c3*t3-c2*t2) )
+								  *( (a1*t1-a2*t2)*(a3) + (b1*t1-b2*t2)*(b3) + (c1*t1-c2*t2)*(c3) )
+								  +(knn[8][0]*t3*t3+knn[8][1]*t5*t5+knn[8][2]*t3*t5-E92)*(2*knn[8][0]*t3+knn[8][2]*t5)
+								  ;
+
+			  Ft4=(knn[3][0]*t1*t1+knn[3][1]*t4*t4+knn[3][2]*t1*t4-E42)*(2*knn[3][1]*t4+knn[3][2]*t1)
+			                      +(knn[4][0]*t2*t2+knn[4][1]*t4*t4+knn[4][2]*t2*t4-E52)*(2*knn[4][1]*t4+knn[4][2]*t2)
+			                      +(knn[5][0]*t3*t3+knn[5][1]*t4*t4+knn[5][2]*t3*t4-E62)*(2*knn[5][1]*t4+knn[5][2]*t3)
+								  /*+10*( (a1*t1-a2*t2)*(a4*t4-a2*t2) + (b1*t1-b2*t2)*(b4*t4-b2*t2) + (c1*t1-c2*t2)*(c4*t4-c2*t2) )
+								  *( (a1*t1-a2*t2)*(a4) + (b1*t1-b2*t2)*(b4) + (c1*t1-c2*t2)*(c4) )*/
+								  +(knn[9][0]*t4*t4+knn[9][1]*t5*t5+knn[9][2]*t4*t5-EA2)*(2*knn[9][0]*t4+knn[9][2]*t5)
+								  ;
+
+			  Ft5=(knn[6][0]*t1*t1+knn[6][1]*t5*t5+knn[6][2]*t1*t5-E72)*(2*knn[6][1]*t5+knn[6][2]*t1)
+			                       +(knn[7][0]*t2*t2+knn[7][1]*t5*t5+knn[7][2]*t2*t5-E82)*(2*knn[7][1]*t5+knn[7][2]*t2)
+			                       +(knn[8][0]*t3*t3+knn[8][1]*t5*t5+knn[8][2]*t3*t5-E92)*(2*knn[8][1]*t5+knn[8][2]*t3)
+			                       +(knn[9][0]*t4*t4+knn[9][1]*t5*t5+knn[9][2]*t4*t5-EA2)*(2*knn[9][1]*t5+knn[9][2]*t4)
+								   ;
+			 }
+
+			 t1b=t1-nn*Ft1;
+			 t2b=t2-nn*Ft2;
+			 t3b=t3-nn*Ft3;
+			 t4b=t4-nn*Ft4;
+			 t5b=t5-nn*Ft5;
+			 if(Point_Check==5)
+			 {
+				 if(t1==t1b && t2==t2b && t3==t3b &&t4==t4b &&t5==t5b) break;
+				 //if(ABS(t1-t1b)<0.000005 && ABS(t2-t2b)<0.000005 && ABS(t3-t3b)<0.000005 && ABS(t4-t4b)<0.000005 && ABS(t5-t5b)<0.000005) break;
+			 }
+			 
+
+			 t1=t1b;
+			 t2=t2b;
+			 t3=t3b;
+			 t4=t4b;
+			 t5=t5b;
+		 }
+			DiguNum=i;
+		 }
+
+		 //将递归结果返回全局变量保存
+		 t1_Global=t1;
+		 t2_Global=t2;
+		 t3_Global=t3;
+		 t4_Global=t4;
+		 t5_Global=t5;
+
+		  //---------------------------------------------------
+		 //nn=0.00001581;
+		 //t1-=0.001;
+		 //t2-=0.001;
+		 //t3-=0.001;
+		 //t4-=0.001;
+		 //for(int i=0;i<25535;i++)
+		 //{
+
+			// if(Point_Check==4)//四点递归
+			// {
+				 //Ft1=(knn[0][0]*t1*t1+knn[0][1]*t2*t2+knn[0][2]*t1*t2-E12)*(2*knn[0][0]*t1+knn[0][2]*t2)
+					//				  +(knn[2][0]*t1*t1+knn[2][1]*t3*t3+knn[2][2]*t1*t3-E32)*(2*knn[2][0]*t1+knn[2][2]*t3)
+					//				  +(knn[3][0]*t1*t1+knn[3][1]*t4*t4+knn[3][2]*t1*t4-E42)*(2*knn[3][0]*t1+knn[3][2]*t4)
+					//				  +10*( (a1*t1-a2*t2)*(a3*t3-a2*t2) + (b1*t1-b2*t2)*(b3*t3-b2*t2) + (c1*t1-c2*t2)*(c3*t3-c2*t2) )
+					//				  *( (a1)*(a3*t3-a2*t2) + (b1)*(b3*t3-b2*t2) + (c1)*(c3*t3-c2*t2) )
+					//				  /*+10*( (a1*t1-a2*t2)*(a4*t4-a2*t2) + (b1*t1-b2*t2)*(b4*t4-b2*t2) + (c1*t1-c2*t2)*(c4*t4-c2*t2) )
+					//				   *( (a1)*(a4*t4-a2*t2) + (b1)*(b4*t4-b2*t2) + (c1)*(c4*t4-c2*t2) )*/
+					//				  ;
+
+				 // Ft2=(knn[0][0]*t1*t1+knn[0][1]*t2*t2+knn[0][2]*t1*t2-E12)*(2*knn[0][1]*t2+knn[0][2]*t1)
+					//				  +(knn[1][0]*t2*t2+knn[1][1]*t3*t3+knn[1][2]*t2*t3-E22)*(2*knn[1][0]*t2+knn[1][2]*t3)
+					//				  +(knn[4][0]*t2*t2+knn[4][1]*t4*t4+knn[4][2]*t2*t4-E52)*(2*knn[4][0]*t2+knn[4][2]*t4)
+					//				  +10*( (a1*t1-a2*t2)*(a3*t3-a2*t2) + (b1*t1-b2*t2)*(b3*t3-b2*t2) + (c1*t1-c2*t2)*(c3*t3-c2*t2) )
+					//				  *( (-a2)*(a3*t3-a2*t2)+ (a1*t1-a2*t2)*(-a2) + (-b2)*(b3*t3-b2*t2)+(b1*t1-b2*t2)*(-b2) + (-c2)*(c3*t3-c2*t2) +(c1*t1-c2*t2)*(-c2) )
+					//				  /*+10*( (a1*t1-a2*t2)*(a4*t4-a2*t2) + (b1*t1-b2*t2)*(b4*t4-b2*t2) + (c1*t1-c2*t2)*(c4*t4-c2*t2) )
+					//				  *( (-a2)*(a4*t4-a2*t2)+ (a1*t1-a2*t2)*(-a2) + (-b2)*(b4*t4-b2*t2)+(b1*t1-b2*t2)*(-b2) + (-c2)*(c4*t4-c2*t2) +(c1*t1-c2*t2)*(-c2) )*/
+					//				  ;
+
+				 // Ft3=(knn[1][0]*t2*t2+knn[1][1]*t3*t3+knn[1][2]*t2*t3-E22)*(2*knn[1][1]*t3+knn[1][2]*t2)
+					//				  +(knn[2][0]*t1*t1+knn[2][1]*t3*t3+knn[2][2]*t1*t3-E32)*(2*knn[2][1]*t3+knn[2][2]*t1)
+					//				  +(knn[5][0]*t3*t3+knn[5][1]*t4*t4+knn[5][2]*t3*t4-E62)*(2*knn[5][0]*t3+knn[5][2]*t4)
+					//				  +10*( (a1*t1-a2*t2)*(a3*t3-a2*t2) + (b1*t1-b2*t2)*(b3*t3-b2*t2) + (c1*t1-c2*t2)*(c3*t3-c2*t2) )
+					//				  *( (a1*t1-a2*t2)*(a3) + (b1*t1-b2*t2)*(b3) + (c1*t1-c2*t2)*(c3) )
+					//				  ;
+
+				 // Ft4=(knn[3][0]*t1*t1+knn[3][1]*t4*t4+knn[3][2]*t1*t4-E42)*(2*knn[3][1]*t4+knn[3][2]*t1)
+					//				  +(knn[4][0]*t2*t2+knn[4][1]*t4*t4+knn[4][2]*t2*t4-E52)*(2*knn[4][1]*t4+knn[4][2]*t2)
+					//				  +(knn[5][0]*t3*t3+knn[5][1]*t4*t4+knn[5][2]*t3*t4-E62)*(2*knn[5][1]*t4+knn[5][2]*t3)
+					//				  /*+10*( (a1*t1-a2*t2)*(a4*t4-a2*t2) + (b1*t1-b2*t2)*(b4*t4-b2*t2) + (c1*t1-c2*t2)*(c4*t4-c2*t2) )
+					//				  *( (a1*t1-a2*t2)*(a4) + (b1*t1-b2*t2)*(b4) + (c1*t1-c2*t2)*(c4) )*/
+					//				  ;
+			// }
+
+			// else if(Point_Check==3)//三点递归
+			// {
+			//	 Ft1=(knn[0][0]*t1*t1+knn[0][1]*t2*t2+knn[0][2]*t1*t2-E12)*(2*knn[0][0]*t1+knn[0][2]*t2)
+			//		 +(knn[2][0]*t1*t1+knn[2][1]*t3*t3+knn[2][2]*t1*t3-E32)*(2*knn[2][0]*t1+knn[2][2]*t3);
+
+			//	 Ft2=(knn[0][0]*t1*t1+knn[0][1]*t2*t2+knn[0][2]*t1*t2-E12)*(2*knn[0][1]*t2+knn[0][2]*t1)
+			//		 +(knn[1][0]*t2*t2+knn[1][1]*t3*t3+knn[1][2]*t2*t3-E22)*(2*knn[1][0]*t2+knn[1][2]*t3);
+
+			//	 Ft3=(knn[1][0]*t2*t2+knn[1][1]*t3*t3+knn[1][2]*t2*t3-E22)*(2*knn[1][1]*t3+knn[1][2]*t2)
+			//		 +(knn[2][0]*t1*t1+knn[2][1]*t3*t3+knn[2][2]*t1*t3-E32)*(2*knn[2][1]*t3+knn[2][2]*t1);
+			// }
+			// t1b=t1-nn*Ft1;
+			// t2b=t2-nn*Ft2;
+			// t3b=t3-nn*Ft3;
+			// t4b=t4-nn*Ft4;
+			// if(Point_Check==4)
+			// {
+			//	 if(t1==t1b && t2==t2b && t3==t3b &&t4==t4b) break;
+			// }
+			// else if(Point_Check==3)
+			// {
+			//	 if(t1==t1b && t2==t2b && t3==t3b ) break;
+			// }
+			// t1=t1b;
+			// t2=t2b;
+			// t3=t3b;
+			// t4=t4b;
+		 //}
+		 //---------------------------------------------------
+		 //dst_min=180*180*180;
+		 //for(int k1=-25;k1<+25;k1++)
+		 //{
+			// float kf1=t1+float(k1)*0.15f;
+
+			// float x1=LineRays[0].x*kf1+x0;
+			// float y1=LineRays[0].y*kf1+y0;
+			// float z1=LineRays[0].z*kf1+z0;
+
+			// for(int k2=-25;k2<25;k2++)
+			// {
+			//	 float kf2=t2+float(k2)*0.15f;
+
+			//	 float x2=LineRays[4].x*kf2+x0;P
+			//	 float y2=LineRays[4].y*kf2+y0;
+			//	 float z2=LineRays[4].z*kf2+z0;
+
+			//	 for(int k3=-25;k3<25;k3++)
+			//	 {
+			//		 float kf3=t3+float(k3)*0.15f;
+			//		 float x3=LineRays[5].x*kf3+x0;
+			//		 float y3=LineRays[5].y*kf3+y0;
+			//		 float z3=LineRays[5].z*kf3+z0;
+
+
+			//		 //-------
+			//		 float line1_dst=GL_Distance(x1,y1,z1,x2,y2,z2);//理想值 sqrt(16)
+			//		 float line2_dst=GL_Distance(x2,y2,z2,x3,y3,z3);//理想值 sqrt(16)
+
+			//		 float line3_dst=GL_Distance(x1,y1,z1,x3,y3,z3);//理想值 32
+			//		 float dst_sum=
+			//			  ABS(line1_dst-16)
+			//			 +ABS(line2_dst-16)
+			//			 +ABS(line3_dst-32)
+			//			 ;
+
+			//		 if(dst_min>dst_sum)
+			//		 {
+			//			 dst_min=dst_sum;
+			//			 t1=kf1;
+			//			 t2=kf2;
+			//			 t3=kf3;
+			//		 }
+			//	 }
+			// }
+		 //}
+}
+/***************************** 计算能量函数 *****************************/
+void GL_Energy()
+{
+	//-------------------------------- 测试梯度下降算法
+#if 0
+	int Ces=1;
+	if(Ces==0)
+	{
+		// y=x*x/2-2*x
+		// y偏导= x-2
+		float x=1;
+		float Nn=0.9;
+		float Ee=0;
+		for(int i=0;i<6;i++)
+		{
+			float Fx=x-2;
+			float xb=x-Nn*Fx;
+			Ee=-Nn*Fx;
+			x=xb;
+		}
+
+		printf("误差 = %f ,最优解 = %f \n",Ee,x);
+	}
+	if(Ces==1)
+	{
+		// f(x,y)=(x-7)*(x-7) + 2*(y-4)*(y-4)+3
+		// f的x偏导数 = 2*(x-7)/2
+		// f的y偏导数 = 4*(y-4)/2
+		float x=1,y=1;
+		float Nn=0.1;
+		float Eex=0,Eey=0;
+		for(int i=0;i<600;i++)
+		{
+			
+			float Fx=2*(x-7);
+			
+			float Fy=4*(y-4);
+
+			float xb=x-Nn*Fx;
+			float yb=y-Nn*Fy;
+
+			x=xb;
+			y=yb;
+
+			Eex=-Nn*Fx;
+			Eey=-Nn*Fy;
+
+			
+		}
+
+		//printf("误差xy = (%f, %f) ,最优解xy = (%f,%f) \n",Eex,Eey,x,y);
+	}
+#endif
+	//--------------------------------
+	float Edge=45*2;
+	GL_Point Pt0;
+	Pt0.x=-Edge;
+	Pt0.y=81;
+	Pt0.z=0;
+
+	float x0=Pt0.x;
+	float y0=Pt0.y;
+	float z0=Pt0.z;
+
+	//LineRays[];
+	// (x-x0)/a=(y-y0)/b=(z-z0)/c=t
+	// x=at+x0
+	// y=bt+y0
+	// z=ct+z0
+
+	//-------------------------------------------------------------------------------------------------------
+	if(!Best_Flag && EnableX[0]&&EnableY[0] && EnableX[5]&&EnableY[5] && EnableX[4]&&EnableY[4]// 扫描点 使能判断，满足使能条件 则 进行算法迭代。
+	    && EnableX[6]&&EnableY[6] 
+		&& EnableX[1]&&EnableY[1] 
+	)
+	{
+		 int DiguNum=0;//记录递归算法小循环
+		 int DiguCnt=0;//记录递归算法大循环 N*65535
+		 int Point_Check;//模式选择：算法点数
+		 int i=0;
+		 
+		 long start_time=clock();//Cpu测试算法时间 起始：
+		 //-------------------------------------------------------------------------------------------递归算法 Start
+		 //GL_Build_Steepest_M(Point_Check,DiguCnt,DiguNum );
+		 GL_Build_Steepest_M5Point(Point_Check,DiguCnt,DiguNum );
+		 Best_Flag=1;
+		 //-------------------------------------------------------------------------------------------递归算法 Finsh
+		
 		 long end_time=clock();//Cpu 算法计时完成
 		 float timex=float(end_time-start_time)/1000;
 		 printf("/****************************************************************************/\n");
@@ -1579,14 +1954,6 @@ void GL_Energy()
 		 fprintf(file,"/***************************************/\n");
 		 fprintf(file,"CPU递归时间 ： %f \n",timex);
 		
-
-		 Best_Flag=1;
-
-
-		t1_Global=t1;
-		t2_Global=t2;
-		t3_Global=t3;
-		t4_Global=t4;
 		//printf("------ >>>  最小能量 ： %f\n",dst_min);
 		//------
 		float x1=LineRays[4].x*t2_Global+x0;
@@ -1642,8 +2009,8 @@ void GL_Energy()
 		printf("4.5*4.5空间(16cm 界限) >>> 达标与不达标个数： ( %d , %d )\n",Cnt_Correct12,Cnt_Err12);
 		//------------------------------------
 		//多点显示
-		float x_ture[4],y_ture[4],z_ture[4];//真实
-		float x_etm[4],y_etm[4],z_etm[4];//估计
+		float x_ture[5],y_ture[5],z_ture[5];//真实
+		float x_etm[5],y_etm[5],z_etm[5];//估计
 
 		x_etm[0]=LineRays[0].x*t1_Global+x0;
 		y_etm[0]=LineRays[0].y*t1_Global+y0;
@@ -1660,6 +2027,10 @@ void GL_Energy()
 		x_etm[3]=LineRays[6].x*t4_Global+x0;
 		y_etm[3]=LineRays[6].y*t4_Global+y0;
 		z_etm[3]=LineRays[6].z*t4_Global+z0;
+
+		x_etm[4]=LineRays[1].x*t5_Global+x0;
+		y_etm[4]=LineRays[1].y*t5_Global+y0;
+		z_etm[4]=LineRays[1].z*t5_Global+z0;
 		//---------------------------------
 		x_ture[0]=HeadPlay_Pt[0].x;
 		y_ture[0]=HeadPlay_Pt[0].y;
@@ -1676,9 +2047,16 @@ void GL_Energy()
 		x_ture[3]=HeadPlay_Pt[6].x;
 		y_ture[3]=HeadPlay_Pt[6].y;
 		z_ture[3]=HeadPlay_Pt[6].z;
+
+		x_ture[4]=HeadPlay_Pt[1].x;
+		y_ture[4]=HeadPlay_Pt[1].y;
+		z_ture[4]=HeadPlay_Pt[1].z;
 		//-----------------------------
 		printf("-------------------------- 冗余多点信息 ：\n");
-		for(int i=0;i<4;i++)
+
+		FILE *file_Err=fopen(".//ErronPos.txt","a+");
+		
+		for(int i=0;i<Point_Check;i++)
 		{
 			printf(" %d) 真实值：(%f,%f,%f) \n",i+1,x_ture[i],y_ture[i],z_ture[i]);
 			printf("     估计值：(%f,%f,%f) \n",    x_etm[i],y_etm[i],z_etm[i]);
@@ -1691,8 +2069,20 @@ void GL_Energy()
 			{
 				printf("------------------------------->> Erron   !!!………………\n");
 				Erron_CntBest++;
+
+				//错误情况进行记录用于分析
+				fprintf(file_Err,"                       ------<< %d 点估计 >>------ \n",Point_Check);
+				fprintf(file_Err,"                             <<< 第 %d 帧 >>>\n",Fps_World);
+				fprintf(file_Err,"递归次数：%d*65535 + %d \n",DiguCnt-1,DiguNum);
+				fprintf(file_Err,"CPU递归时间 ： %f \n",timex);
+				fprintf(file_Err,"%d) 错误情况: 点ID:%d\n",Erron_CntBest,i+1);
+				fprintf(file_Err,"    真实值：(%f,%f,%f)\n",x_ture[i],y_ture[i],z_ture[i]);
+				fprintf(file_Err,"    估计值：(%f,%f,%f)\n",x_etm[i],y_etm[i],z_etm[i]);
+				fprintf(file_Err,"    误差值：(%f,%f,%f)\n",ABS(x_ture[i]-x_etm[i]),ABS(y_ture[i]-y_etm[i]),ABS(z_ture[i]-z_etm[i]));
+				fprintf(file_Err,"    PRY姿态角：(%d,%d,%d)\n",Pitch_angle,Rool_angle,Yaw_angle);
 			}
 		}
+		fclose(file_Err);
 
 		printf("@::::::::::::::::::  (2.5cm以内)最优错误计数 ： %d\n",Erron_CntBest);
 		//---------------------
@@ -1700,8 +2090,6 @@ void GL_Energy()
 		fprintf(file,"单位：每厘米 为 0.4 \n");
 		fprintf(file,"真实值 : (%f,%f,%f)\n",xp0,yp0,zp0);
 		fprintf(file,"估计值 : (%f,%f,%f)\n",x1,y1,z1);
-
-		
 
 		fprintf(file,"误差值 ：(%f,%f,%f)\n",abs(xp0-x1),abs(yp0-y1),abs(zp0-z1));
 
@@ -1717,8 +2105,8 @@ void GL_Energy()
 		fclose(file);
 
 		 FILE *file2=fopen(".//LastData.txt","a+");
-		 fprintf(file2,"(%f,%f,%f),(%f,%f,%f,%f),(%f,%f,%f),(%d,%d),(%d,%d),(%d,%d)\n",
-					pos_x,pos_y,pos_z,q0,q1,q2,q3,t1,t2,t3,
+		 fprintf(file2,"(%f,%f,%f),(%f,%f,%f,%f),(%d,%d),(%d,%d),(%d,%d)\n",
+					pos_x,pos_y,pos_z,q0,q1,q2,q3,
 					Cnt_Correct,Cnt_Err,Cnt_Correct3,Cnt_Err3,Cnt_Correct12,Cnt_Err12
 					);
 		fclose(file2);
@@ -1732,7 +2120,7 @@ void GL_Draw_Track_Point()
 	float Edge=45*2;
 	GL_Point Pt0;
 	Pt0.x=-Edge;
-	Pt0.y=52;
+	Pt0.y=81;
 	Pt0.z=0;
 
 	float x0=Pt0.x;
