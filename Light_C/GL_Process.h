@@ -41,7 +41,7 @@ float Angle_Y=0,Angle_X=0;
 
 bool Flag_X=0,Flag_Y=1;
 
-float pos_x=0,pos_y=65,pos_z=150;
+float pos_x=-16,pos_y=65,pos_z=39;
 int gxr_Global=0;
 int gyr_Global=0;
 int gzr_Global=0;
@@ -49,6 +49,10 @@ int gzr_Global=0;
 bool GL_Flag_Stop=0;
 bool Best_Flag=0;//一帧显示一次最优拟合标志
 float t1_Global=60,t2_Global=60,t3_Global=60,t4_Global=60,t5_Global=60;
+
+float tN_GlobalS_4[6][4]={60,60,60,60,60,60};//6组 4点建模 迭代寄存器
+
+
 IplImage *frame_GL=cvCreateImage(cvSize(800,400),IPL_DEPTH_8U, 3);
 
 int Step_Recursion=0;
@@ -775,7 +779,7 @@ float GL_Distance(float x1,float y1,float z1,float x2,float y2,float z2)
 {
 	float dis=0;
 	dis=(x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) + (z1-z2)*(z1-z2);
-	//dis=sqrt(dis);
+	dis=sqrt(dis);
 	return dis;
 }
 /**********************************************************/
@@ -1118,6 +1122,24 @@ void GL_LineRays()
 	sprintf_s(buf_T,256,"pos z:%f",pos_z);
 	cvPutText(frame_GL,buf_T,cvPoint(10,130),&font,CV_RGB(0,255,255));
 
+	//-------------------------------------
+	float Edge=45*2;
+	GL_Point Pt0;
+	Pt0.x=-Edge;
+	Pt0.y=81;
+	Pt0.z=0;
+
+	float x0=Pt0.x;
+	float y0=Pt0.y;
+	float z0=Pt0.z;
+
+	float xx=LineRays[0].x*t1_Global+x0;
+	float yy=LineRays[0].y*t1_Global+y0;
+	float zz=LineRays[0].z*t1_Global+z0;
+	float dst_print=GL_Distance(x0,y0,z0,xx,yy,zz);
+	sprintf_s(buf_T,256,"Dist: %f",dst_print);
+	cvPutText(frame_GL,buf_T,cvPoint(10,160),&font,CV_RGB(0,255,255));
+
 	cvNamedWindow("Frame_GL2",1);
 	cvShowImage("Frame_GL2",frame_GL);
 }
@@ -1128,36 +1150,74 @@ void GLB_Knn(float Knn[][3],float a1,float b1,float c1,float a2,float b2,float c
 	Knn[num][1]=a2*a2+b2*b2+c2*c2;
 	Knn[num][2]=-2.0f*(a1*a2+b1*b2+c1*c2);
 }
-/***************************** 边长距离建模 最速迭代 *****************************/
+/***************************** 边长距离建模 4点 最速迭代 *****************************/
 // DiguNum : 记录递归算法小循环
 // DiguCnt : 记录递归算法大循环 N*65535
 // Point_Check ：模式选择：算法点数
-void GL_Build_Steepest_M(int &Point_Check,int &DiguCnt,int &DiguNum )
+// ID_Pt：拟合的ID点号 （例子：0,4,5,6）
+// ID_Length: 对应的ID点之间长度：
+//            对应规则：// 1->2
+//						   2->3
+//						   1->3
+//						   1->4
+//						   2->4
+//						   3->4
+ //例子：float E12=16;// 1->2
+	//	 float E22=16;// 2->3
+	//	 float E32=32;// 1->3
+	//	 float E42=32;// 1->4
+	//	 float E52=16;// 2->4
+	//	 float E62=64;// 3->4
+// tN_GlobalS_4N：四点拟合二维数组
+// numc:四点拟合的组数
+void GL_Build_Steepest_M4Point(int *ID_Pt,float*ID_Length,float tN_GlobalS_4N[][4],int numc,
+	                     int &Point_Check,int &DiguCnt,int &DiguNum )
 {
 	Point_Check=4;//模式选择：算法点数
-	
+	float t1=tN_GlobalS_4N[numc][0];
+	float t2=tN_GlobalS_4N[numc][1];
+	float t3=tN_GlobalS_4N[numc][2];
+	float t4=tN_GlobalS_4N[numc][3];
 	//-------------------
-	float t1=0,t2=0,t3=0,t4=0;
 	float Ft1,Ft2,Ft3,Ft4;
-	t1=t1_Global;t2=t2_Global;t3=t3_Global;t4=t4_Global;
 	float t1b=100,t2b=100,t3b=100,t4b=100;;
-	float nn=0.00072531;// 递归步长 适中（不能太大也不能太小）。
-	if(Point_Check==3)
-	{
-		nn==0.0021;
-	}
+	
+
 	//射线向量
-	float a1=LineRays[0].x; float b1=LineRays[0].y; float c1=LineRays[0].z;
-	float a2=LineRays[4].x; float b2=LineRays[4].y; float c2=LineRays[4].z;
-	float a3=LineRays[5].x; float b3=LineRays[5].y; float c3=LineRays[5].z;
-	float a4=LineRays[6].x; float b4=LineRays[6].y; float c4=LineRays[6].z;
+	float a1=LineRays[ID_Pt[0]].x; float b1=LineRays[ID_Pt[0]].y; float c1=LineRays[ID_Pt[0]].z;
+	float a2=LineRays[ID_Pt[1]].x; float b2=LineRays[ID_Pt[1]].y; float c2=LineRays[ID_Pt[1]].z;
+	float a3=LineRays[ID_Pt[2]].x; float b3=LineRays[ID_Pt[2]].y; float c3=LineRays[ID_Pt[2]].z;
+	float a4=LineRays[ID_Pt[3]].x; float b4=LineRays[ID_Pt[3]].y; float c4=LineRays[ID_Pt[3]].z;
+	//
+	float x=a1*t1;
+	float y=b1*t1;
+	float z=c1*t1;
+	float track_dst=GL_Distance(0,0,0,x,y,z);
+
+	float nn=0.000725;// 递归步长 适中（不能太大也不能太小）。
+
+	//float nn=0.00012531;// 递归步长 适中（不能太大也不能太小）。
+	if(track_dst<110)
+	{
+		 nn=0.000315;
+	}
+	if(track_dst<80)
+	{
+		 nn=0.000125;
+	}
+	if(!Fps_Track_Start)
+	{
+		 nn=0.00024531;
+	}
+
+	Fps_Track_Start=1;
 	//边长平方
-	float E12=16;// 1->2
-	float E22=16;// 2->3
-	float E32=32;// 1->3
-	float E42=32;// 1->4
-	float E52=16;// 2->4
-	float E62=64;// 3->4
+	float E12=ID_Length[0];//16;// 1->2
+	float E22=ID_Length[1];//16;// 2->3
+	float E32=ID_Length[2];//32;// 1->3
+	float E42=ID_Length[3];//32;// 1->4
+	float E52=ID_Length[4];//16;// 2->4
+	float E62=ID_Length[5];//64;// 3->4
 	//------构建模型系数
 	float knn[10][3];
 	GLB_Knn(knn,a1,b1,c1,a2,b2,c2,0);
@@ -1361,10 +1421,10 @@ void GL_Build_Steepest_M(int &Point_Check,int &DiguCnt,int &DiguNum )
 		 }
 
 		 //将递归结果返回全局变量保存
-		 t1_Global=t1;
-		 t2_Global=t2;
-		 t3_Global=t3;
-		 t4_Global=t4;
+		 tN_GlobalS_4N[numc][0]=t1;
+		 tN_GlobalS_4N[numc][1]=t2;
+		 tN_GlobalS_4N[numc][2]=t3;
+		 tN_GlobalS_4N[numc][3]=t4;
 
 		  //---------------------------------------------------
 		 //nn=0.00001581;
@@ -1499,7 +1559,7 @@ void GL_Build_Steepest_M5Point(int &Point_Check,int &DiguCnt,int &DiguNum )
 	float Ft1,Ft2,Ft3,Ft4,Ft5;
 	t1=t1_Global;t2=t2_Global;t3=t3_Global;t4=t4_Global,t5=t5_Global;
 	float t1b=100,t2b=100,t3b=100,t4b=100,t5b=100;
-	float nn=0.001071;// 递归步长 适中（不能太大也不能太小）。
+	float nn=0.000571;// 递归步长 适中（不能太大也不能太小）。
 
 	//射线向量
 	float a1=LineRays[0].x; float b1=LineRays[0].y; float c1=LineRays[0].z;
@@ -1658,8 +1718,8 @@ void GL_Build_Steepest_M5Point(int &Point_Check,int &DiguCnt,int &DiguNum )
 			  Ft1=(knn[0][0]*t1*t1+knn[0][1]*t2*t2+knn[0][2]*t1*t2-E12)*(2*knn[0][0]*t1+knn[0][2]*t2)
 			                      +(knn[2][0]*t1*t1+knn[2][1]*t3*t3+knn[2][2]*t1*t3-E32)*(2*knn[2][0]*t1+knn[2][2]*t3)
 			                      +(knn[3][0]*t1*t1+knn[3][1]*t4*t4+knn[3][2]*t1*t4-E42)*(2*knn[3][0]*t1+knn[3][2]*t4)
-								  +10*( (a1*t1-a2*t2)*(a3*t3-a2*t2) + (b1*t1-b2*t2)*(b3*t3-b2*t2) + (c1*t1-c2*t2)*(c3*t3-c2*t2) )
-								  *( (a1)*(a3*t3-a2*t2) + (b1)*(b3*t3-b2*t2) + (c1)*(c3*t3-c2*t2) )
+								 // +10*( (a1*t1-a2*t2)*(a3*t3-a2*t2) + (b1*t1-b2*t2)*(b3*t3-b2*t2) + (c1*t1-c2*t2)*(c3*t3-c2*t2) )
+								 // *( (a1)*(a3*t3-a2*t2) + (b1)*(b3*t3-b2*t2) + (c1)*(c3*t3-c2*t2) )
 								  /*+10*( (a1*t1-a2*t2)*(a4*t4-a2*t2) + (b1*t1-b2*t2)*(b4*t4-b2*t2) + (c1*t1-c2*t2)*(c4*t4-c2*t2) )
 								   *( (a1)*(a4*t4-a2*t2) + (b1)*(b4*t4-b2*t2) + (c1)*(c4*t4-c2*t2) )*/
 								   +(knn[6][0]*t1*t1+knn[6][1]*t5*t5+knn[6][2]*t1*t5-E72)*(2*knn[6][0]*t1+knn[6][2]*t5)
@@ -1668,8 +1728,8 @@ void GL_Build_Steepest_M5Point(int &Point_Check,int &DiguCnt,int &DiguNum )
 			  Ft2=(knn[0][0]*t1*t1+knn[0][1]*t2*t2+knn[0][2]*t1*t2-E12)*(2*knn[0][1]*t2+knn[0][2]*t1)
 			                      +(knn[1][0]*t2*t2+knn[1][1]*t3*t3+knn[1][2]*t2*t3-E22)*(2*knn[1][0]*t2+knn[1][2]*t3)
 			                      +(knn[4][0]*t2*t2+knn[4][1]*t4*t4+knn[4][2]*t2*t4-E52)*(2*knn[4][0]*t2+knn[4][2]*t4)
-								  +10*( (a1*t1-a2*t2)*(a3*t3-a2*t2) + (b1*t1-b2*t2)*(b3*t3-b2*t2) + (c1*t1-c2*t2)*(c3*t3-c2*t2) )
-								  *( (-a2)*(a3*t3-a2*t2)+ (a1*t1-a2*t2)*(-a2) + (-b2)*(b3*t3-b2*t2)+(b1*t1-b2*t2)*(-b2) + (-c2)*(c3*t3-c2*t2) +(c1*t1-c2*t2)*(-c2) )
+								  //+10*( (a1*t1-a2*t2)*(a3*t3-a2*t2) + (b1*t1-b2*t2)*(b3*t3-b2*t2) + (c1*t1-c2*t2)*(c3*t3-c2*t2) )
+								 // *( (-a2)*(a3*t3-a2*t2)+ (a1*t1-a2*t2)*(-a2) + (-b2)*(b3*t3-b2*t2)+(b1*t1-b2*t2)*(-b2) + (-c2)*(c3*t3-c2*t2) +(c1*t1-c2*t2)*(-c2) )
 								  /*+10*( (a1*t1-a2*t2)*(a4*t4-a2*t2) + (b1*t1-b2*t2)*(b4*t4-b2*t2) + (c1*t1-c2*t2)*(c4*t4-c2*t2) )
 				                  *( (-a2)*(a4*t4-a2*t2)+ (a1*t1-a2*t2)*(-a2) + (-b2)*(b4*t4-b2*t2)+(b1*t1-b2*t2)*(-b2) + (-c2)*(c4*t4-c2*t2) +(c1*t1-c2*t2)*(-c2) )*/
 								  +(knn[7][0]*t2*t2+knn[7][1]*t5*t5+knn[7][2]*t2*t5-E82)*(2*knn[7][0]*t2+knn[7][2]*t5)
@@ -1678,8 +1738,8 @@ void GL_Build_Steepest_M5Point(int &Point_Check,int &DiguCnt,int &DiguNum )
 			  Ft3=(knn[1][0]*t2*t2+knn[1][1]*t3*t3+knn[1][2]*t2*t3-E22)*(2*knn[1][1]*t3+knn[1][2]*t2)
 			                      +(knn[2][0]*t1*t1+knn[2][1]*t3*t3+knn[2][2]*t1*t3-E32)*(2*knn[2][1]*t3+knn[2][2]*t1)
 			                      +(knn[5][0]*t3*t3+knn[5][1]*t4*t4+knn[5][2]*t3*t4-E62)*(2*knn[5][0]*t3+knn[5][2]*t4)
-								  +10*( (a1*t1-a2*t2)*(a3*t3-a2*t2) + (b1*t1-b2*t2)*(b3*t3-b2*t2) + (c1*t1-c2*t2)*(c3*t3-c2*t2) )
-								  *( (a1*t1-a2*t2)*(a3) + (b1*t1-b2*t2)*(b3) + (c1*t1-c2*t2)*(c3) )
+								//  +10*( (a1*t1-a2*t2)*(a3*t3-a2*t2) + (b1*t1-b2*t2)*(b3*t3-b2*t2) + (c1*t1-c2*t2)*(c3*t3-c2*t2) )
+								//  *( (a1*t1-a2*t2)*(a3) + (b1*t1-b2*t2)*(b3) + (c1*t1-c2*t2)*(c3) )
 								  +(knn[8][0]*t3*t3+knn[8][1]*t5*t5+knn[8][2]*t3*t5-E92)*(2*knn[8][0]*t3+knn[8][2]*t5)
 								  ;
 
@@ -1928,10 +1988,33 @@ void GL_Energy()
 		 int i=0;
 		 
 		 long start_time=clock();//Cpu测试算法时间 起始：
+
+		 //---------------迭代模式选择
+		 Point_Check=4;
+
 		 //-------------------------------------------------------------------------------------------递归算法 Start
 		 //GL_Build_Steepest_M(Point_Check,DiguCnt,DiguNum );
-		 GL_Build_Steepest_M5Point(Point_Check,DiguCnt,DiguNum );
-		 Best_Flag=1;
+		 //4点拟合
+		 if(Point_Check==4)
+		 {
+			 int ID_Pt[4]={0,4,5,6};
+			 float ID_Length[6]={16,16,32,32,16,64};
+			 int numc=0;//四点拟合组数选择
+			 GL_Build_Steepest_M4Point(ID_Pt,ID_Length, tN_GlobalS_4,numc,Point_Check,DiguCnt,DiguNum );
+			 //返回用于打印显示
+			 t1_Global=tN_GlobalS_4[0][0];
+			 t2_Global=tN_GlobalS_4[0][1];
+			 t3_Global=tN_GlobalS_4[0][2];
+			 t4_Global=tN_GlobalS_4[0][3];
+		 }
+		 
+		 //5点拟合
+		 if(Point_Check==5)
+		 {
+			 GL_Build_Steepest_M5Point(Point_Check,DiguCnt,DiguNum );
+		 }
+		 
+		 Best_Flag=1;//置标志位
 		 //-------------------------------------------------------------------------------------------递归算法 Finsh
 		
 		 long end_time=clock();//Cpu 算法计时完成
@@ -1941,6 +2024,13 @@ void GL_Energy()
 		 printf("                             <<< 第 %d 帧 >>>\n",Fps_World);
 		 printf("递归次数：%d*65535 + %d \n",DiguCnt-1,DiguNum);
 		 printf("CPU递归时间 ： %f \n",timex);
+		 //------------------------
+		 float xx=LineRays[0].x*t1_Global+x0;
+		 float yy=LineRays[0].y*t1_Global+y0;
+		 float zz=LineRays[0].z*t1_Global+z0;
+		 float dst_print=GL_Distance(x0,y0,z0,xx,yy,zz);
+		 printf("目标到扫描原点距离：%f\n",dst_print);
+		 //------------------------
 		 for(int i=0;i<10;i++)
 		 {
 			 printf("  %d) dis_minxy: (%f,%f)\n",i+1,DistsX_min[i],DistsY_min[i]);
@@ -2075,6 +2165,7 @@ void GL_Energy()
 				fprintf(file_Err,"                             <<< 第 %d 帧 >>>\n",Fps_World);
 				fprintf(file_Err,"递归次数：%d*65535 + %d \n",DiguCnt-1,DiguNum);
 				fprintf(file_Err,"CPU递归时间 ： %f \n",timex);
+				fprintf(file_Err,"目标到扫描原点距离：%f\n",dst_print);
 				fprintf(file_Err,"%d) 错误情况: 点ID:%d\n",Erron_CntBest,i+1);
 				fprintf(file_Err,"    真实值：(%f,%f,%f)\n",x_ture[i],y_ture[i],z_ture[i]);
 				fprintf(file_Err,"    估计值：(%f,%f,%f)\n",x_etm[i],y_etm[i],z_etm[i]);
@@ -2212,7 +2303,7 @@ void display(void)
 	//结束绘三角形  
 	glEnd(); 
 #endif
-
+	angle_GL++;
 //--------------------------------
 	//glPushMatrix();//储存当前视图矩阵
 	//glTranslatef(45,0,0);         

@@ -78,4 +78,7 @@ GL_Point GL_Sample_VarianzPt;//均方差
 
 int Erron_CntBest=0;//错误计数
 
+//-------------------------------------------------------- FPS Tracking Start
+bool Fps_Track_Start=0;
+
 #endif
