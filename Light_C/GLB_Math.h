@@ -8,7 +8,56 @@
 
 int Compass_Yaw_Data[8]={0};
 
+/*********************************************************************/
+//计算直线对应 Normals Vector1(ax,ay,az) X Vector2 (bx,by,bz) 
+//平面1： ax*X+ay*Y+az*Z+Da=0
+//平面2： bx*X+by*Y+bz*Z+Db=0
+GL_Line GLB_Line(float ax,float ay,float az,float Da,float bx,float by,float bz,float Db)
+{
+	GL_Line v;
+	v.x=0;
+	v.y=0;
+	v.z=0;
 
+	float N_X=(ay*bz-az*by);
+	float N_Y=(az*bx-ax*bz);
+	float N_Z=(ax*by-ay*bx);
+
+	float norm=N_X*N_X + N_Y*N_Y + N_Z*N_Z;
+	norm = sqrt(norm);
+
+	if(norm!=0)
+	{
+		v.x=N_X/norm;
+		v.y=N_Y/norm;
+		v.z=N_Z/norm;
+
+		if((ax*by-ay*bx)!=0)
+		{
+			v.pt0.x=(ay*Db-by*Da)/(ax*by-ay*bx);
+		}
+		else
+		{
+			v.pt0.x=0;
+		}
+
+
+		if((ay*bx-ax*by)!=0)
+		{
+			v.pt0.y=(ax*Db-bx*Da)/(ay*bx-ax*by);
+		}
+		else
+		{
+			v.pt0.y=0;
+		}
+	
+		v.pt0.z=0;
+
+		return v;
+	}
+
+	return v;
+}
 /*********************************************************************/
 //计算对应 Normals Vector1 X Vector2  
 GL_Vector GLB_CHAJI(float ax,float ay,float az,float bx,float by,float bz)
