@@ -9,6 +9,16 @@
 #include <stdlib.h>
 #include <glut.h>
 #include <math.h>
+//Motor 横向 运动
+float Edge_HW_x = -90.0f;
+float Edge_HW_y = 81.0f;
+float Edge_HW_z = 0.0f;
+//Motor 纵向 运动
+float Edge_ZW_x =-88.0f;
+float Edge_ZW_y = 83.0f;
+float Edge_ZW_z = 0.0f;
+
+int rot_gl_look=0;
 
 typedef struct _GL_Vector_
 {
@@ -17,8 +27,16 @@ typedef struct _GL_Vector_
 	float z;
 }GL_Vector;
 
+typedef struct _GL_Line_
+{
+	float x;
+	float y;
+	float z;
+	GL_Vector pt0; 
+}GL_Line;
+
 GL_Vector Plan_XNorml,Plan_YNorml;// X/Y扫描 平面 法向量
-GL_Vector LineRays[10];//头显点的 射线
+GL_Line LineRays[10];//头显点的 射线
 typedef struct _GL_Plan_
 {
 	float A;
