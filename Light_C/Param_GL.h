@@ -64,6 +64,7 @@ typedef struct _GL_Point_
 }GL_Point;
 
 GL_Point HeadPlay_Pt[10];//头显坐标
+GL_Point HeadPlay_PtB[10];//头显相对 坐标，算法建模时使用。
 bool EnableX[10];//X扫描 使能
 bool EnableY[10];//Y扫描 使能
 

@@ -54,6 +54,7 @@ bool Best_Flag=0;//一帧显示一次最优拟合标志
 float t1_Global=190,t2_Global=190,t3_Global=190,t4_Global=190,t5_Global=190;
 
 float tN_GlobalS_4[6][4];//6组 4点建模 迭代寄存器
+float Energy_Global[6];
 
 
 IplImage *frame_GL=cvCreateImage(cvSize(800,400),IPL_DEPTH_8U, 3);
@@ -591,8 +592,9 @@ if(Flag_X==0 )
 	}
 
 }
-/**********************************************************/
-GL_Point GL_Quater_Point(GL_Quater Qt0,float x_offset,float y_offset,float z_offset,float r,float g,float b)
+/****************************四元数旋转获取头显，传感器坐标点。******************************/
+// PtB: 获取相对传感器位置，用于建模递归时使用。
+GL_Point GL_Quater_Point(GL_Quater Qt0,GL_Point &PtB,float x_offset,float y_offset,float z_offset,float r,float g,float b)
 {
 	GL_Point Pt;
 	
@@ -603,6 +605,11 @@ GL_Point GL_Quater_Point(GL_Quater Qt0,float x_offset,float y_offset,float z_off
 	Q_Point.q1=x_offset;
 	Q_Point.q2=y_offset;
 	Q_Point.q3=z_offset;//根节点骨架长度
+
+	PtB.x=x_offset;// PtB获取相对传感器位置，用于建模递归时使用。
+	PtB.y=y_offset;
+	PtB.z=z_offset;
+
 	//四元数点局部坐标系更新计算 Loc_New_Point=Q*Loc_Old_Point*Q_N
 	//------计算1次相乘
 	GL_Quater Q011=MUL_Q(Qt0,Q_Point);
@@ -707,21 +714,21 @@ void GL_GotHead_DisPlay_Pt()
 	Qt0.q3=q3;
 	
 	
-	HeadPlay_Pt[0]=GL_Quater_Point(Qt0,0,0,0,1.0,0.1,1.0);
-
-	HeadPlay_Pt[1]=GL_Quater_Point(Qt0, 5,0,0, 1,0,0);
-	HeadPlay_Pt[2]=GL_Quater_Point(Qt0, -5,0,0, 1,0,0);
-	HeadPlay_Pt[3]=GL_Quater_Point(Qt0, 0,-4,0, 0,0,1);
-	HeadPlay_Pt[4]=GL_Quater_Point(Qt0, 0,4,0, 0,0,1);
+	HeadPlay_Pt[0]=GL_Quater_Point(Qt0, HeadPlay_PtB[0], 0,0,0, 1.0,0.1,1.0);
+	
+	HeadPlay_Pt[1]=GL_Quater_Point(Qt0, HeadPlay_PtB[1], 5,0,0, 1,0,0);
+	HeadPlay_Pt[2]=GL_Quater_Point(Qt0, HeadPlay_PtB[2], -5,0,0, 1,0,0);
+	HeadPlay_Pt[3]=GL_Quater_Point(Qt0, HeadPlay_PtB[3], 0,-4,0, 0,0,1);
+	HeadPlay_Pt[4]=GL_Quater_Point(Qt0, HeadPlay_PtB[4], 0,4,0, 0,0,1);
 
 	//
-	HeadPlay_Pt[5]=GL_Quater_Point(Qt0, 4,4,0, 0,0.8,0);
-	HeadPlay_Pt[6]=GL_Quater_Point(Qt0, -4,4,0, 0,0.8,0);
-	HeadPlay_Pt[7]=GL_Quater_Point(Qt0, 4,-4,0, 0.9,0.8,0);
-	HeadPlay_Pt[8]=GL_Quater_Point(Qt0, -4,-4,0, 0.9,0.8,0);
+	HeadPlay_Pt[5]=GL_Quater_Point(Qt0, HeadPlay_PtB[5], 4,4,0, 0,0.8,0);
+	HeadPlay_Pt[6]=GL_Quater_Point(Qt0, HeadPlay_PtB[6], -4,4,0, 0,0.8,0);
+	HeadPlay_Pt[7]=GL_Quater_Point(Qt0, HeadPlay_PtB[7], 4,-4,0, 0.9,0.8,0);
+	HeadPlay_Pt[8]=GL_Quater_Point(Qt0, HeadPlay_PtB[8], -4,-4,0, 0.9,0.8,0);
 
 	//(0,0,z)点
-	HeadPlay_Pt[9]=GL_Quater_Point(Qt0, 0,0,-4, 0,0,0);
+	HeadPlay_Pt[9]=GL_Quater_Point(Qt0, HeadPlay_PtB[9], 0,0,-4, 0,0,0);
 
 	int num=10;
 	/*for(int i=0;i<num;i++)
@@ -1094,9 +1101,13 @@ void GLB_Knn2(float Knn[][6],float a1,float b1,float c1,GL_Vector pt1,float a2,f
 	//	 float E62=64;// 3->4
 // tN_GlobalS_4N：四点拟合二维数组
 // numc:四点拟合的组数
-void GL_Build_Steepest_M4Point(int *ID_Pt,float*ID_Length,float tN_GlobalS_4N[][4],int numc,
+void GL_Build_Steepest_M4Point(int *ID_Pt,float*ID_Length,float tN_GlobalS_4N[][4],float* Energy_GlobalN,int numc,
 	                     int &Point_Check,int &DiguCnt,int &DiguNum )
 {
+	//当多组合时，DiguNum 与 DiguCnt必须清零。
+	DiguNum=0;
+	DiguCnt=0;
+
 	Point_Check=4;//模式选择：算法点数
 	float t1=tN_GlobalS_4N[numc][0];
 	float t2=tN_GlobalS_4N[numc][1];
@@ -1165,17 +1176,17 @@ void GL_Build_Steepest_M4Point(int *ID_Pt,float*ID_Length,float tN_GlobalS_4N[][
 	GLB_Knn2(knn,a1,b1,c1,pt0[0], a4,b4,c4,pt0[3], 3);
 	GLB_Knn2(knn,a2,b2,c2,pt0[1], a4,b4,c4,pt0[3], 4);
 	GLB_Knn2(knn,a3,b3,c3,pt0[2], a4,b4,c4,pt0[3], 5);
-	 nn=0.00268531;
+	 nn=0.00298531;
 #endif
-	 if(track_dst>160.0f)
-	 {
-		 nn=0.00288531;
-	 }
+	 //if(track_dst>160.0f)
+	 //{
+		// nn=0.00288531;
+	 //}
 
-	 if(track_dst>180.0f)
-	 {
-		 nn=0.00318531;
-	 }
+	 //if(track_dst>180.0f)
+	 //{
+		// nn=0.00318531;
+	 //}
 	 Step_nn_Global=nn;
 	// F(t1,t2,t3)=(knn[0][0]*t1*t1+knn[0][1]*t2*t2+knn[0][2]*t1*t2+knn[0][3]*t1+knn[0][4]*t2+knn[0][5]-E12)*(knn[0][0]*t1*t1+knn[0][1]*t2*t2+knn[0][2]*t1*t2+knn[0][3]*t1+knn[0][4]*t2+knn[0][5]-E12)
 	//            +(knn[1][0]*t2*t2+knn[1][1]*t3*t3+knn[1][2]*t2*t3+knn[1][3]*t2+knn[1][4]*t3+knn[1][5]-E22)*(knn[1][0]*t2*t2+knn[1][1]*t3*t3+knn[1][2]*t2*t3+knn[1][3]*t2+knn[1][4]*t3+knn[1][5]-E22)
@@ -1283,14 +1294,14 @@ void GL_Build_Steepest_M4Point(int *ID_Pt,float*ID_Length,float tN_GlobalS_4N[][
 			  Ft1=(knn[0][0]*t1*t1+knn[0][1]*t2*t2+knn[0][2]*t1*t2+knn[0][3]*t1+knn[0][4]*t2+knn[0][5]-E12) * (2*knn[0][0]*t1+knn[0][2]*t2+knn[0][3])
 			     +(knn[2][0]*t1*t1+knn[2][1]*t3*t3+knn[2][2]*t1*t3+knn[2][3]*t1+knn[2][4]*t3+knn[2][5]-E32) * (2*knn[2][0]*t1+knn[2][2]*t3+knn[2][3])
 			     +(knn[3][0]*t1*t1+knn[3][1]*t4*t4+knn[3][2]*t1*t4+knn[3][3]*t1+knn[3][4]*t4+knn[3][5]-E42) * (2*knn[3][0]*t1+knn[3][2]*t4+knn[3][3])
-				/* +8.5f*((a1*t1-a2*t2+pt0[0].x-pt0[1].x)*(a3*t3-a2*t2+pt0[2].x-pt0[1].x) + (b1*t1-b2*t2+pt0[0].y-pt0[1].y)*(b3*t3-b2*t2+pt0[2].y-pt0[1].y) + (c1*t1-c2*t2+pt0[0].z-pt0[1].z)*(c3*t3-c2*t2+pt0[2].z-pt0[1].z) )
+				 /*+0.2f*((a1*t1-a2*t2+pt0[0].x-pt0[1].x)*(a3*t3-a2*t2+pt0[2].x-pt0[1].x) + (b1*t1-b2*t2+pt0[0].y-pt0[1].y)*(b3*t3-b2*t2+pt0[2].y-pt0[1].y) + (c1*t1-c2*t2+pt0[0].z-pt0[1].z)*(c3*t3-c2*t2+pt0[2].z-pt0[1].z) )
 				 *( (a1)*(a3*t3-a2*t2+pt0[2].x-pt0[1].x) + (b1)*(b3*t3-b2*t2+pt0[2].y-pt0[1].y) + (c1)*(c3*t3-c2*t2+pt0[2].z-pt0[1].z) )*/
 				 ;
 
 			  Ft2=(knn[0][0]*t1*t1+knn[0][1]*t2*t2+knn[0][2]*t1*t2+knn[0][3]*t1+knn[0][4]*t2+knn[0][5]-E12) * (2*knn[0][1]*t2+knn[0][2]*t1+knn[0][4])
 			     +(knn[1][0]*t2*t2+knn[1][1]*t3*t3+knn[1][2]*t2*t3+knn[1][3]*t2+knn[1][4]*t3+knn[1][5]-E22) * (2*knn[1][0]*t2+knn[1][2]*t3+knn[1][3])
 			     +(knn[4][0]*t2*t2+knn[4][1]*t4*t4+knn[4][2]*t2*t4+knn[4][3]*t2+knn[4][4]*t4+knn[4][5]-E52) * (2*knn[4][0]*t2+knn[4][2]*t4+knn[4][3])
-				/* +8.5f*( (a1*t1-a2*t2+pt0[0].x-pt0[1].x)*(a3*t3-a2*t2+pt0[2].x-pt0[1].x) + (b1*t1-b2*t2+pt0[0].y-pt0[1].y)*(b3*t3-b2*t2+pt0[2].y-pt0[1].y) + (c1*t1-c2*t2+pt0[0].z-pt0[1].z)*(c3*t3-c2*t2+pt0[2].z-pt0[1].z) )
+				 /*+0.2f*( (a1*t1-a2*t2+pt0[0].x-pt0[1].x)*(a3*t3-a2*t2+pt0[2].x-pt0[1].x) + (b1*t1-b2*t2+pt0[0].y-pt0[1].y)*(b3*t3-b2*t2+pt0[2].y-pt0[1].y) + (c1*t1-c2*t2+pt0[0].z-pt0[1].z)*(c3*t3-c2*t2+pt0[2].z-pt0[1].z) )
 				                  *(   (-a2)*(a3*t3-a2*t2+pt0[2].x-pt0[1].x) + (a1*t1-a2*t2+pt0[0].x-pt0[1].x)*(-a2)
 				                     + (-b2)*(b3*t3-b2*t2+pt0[2].y-pt0[1].y) + (b1*t1-b2*t2+pt0[0].y-pt0[1].y)*(-b2)
 				                     + (-c2)*(c3*t3-c2*t2+pt0[2].z-pt0[1].z) + (c1*t1-c2*t2+pt0[0].z-pt0[1].z)*(-c2))*/
@@ -1299,7 +1310,7 @@ void GL_Build_Steepest_M4Point(int *ID_Pt,float*ID_Length,float tN_GlobalS_4N[][
 			  Ft3=(knn[1][0]*t2*t2+knn[1][1]*t3*t3+knn[1][2]*t2*t3+knn[1][3]*t2+knn[1][4]*t3+knn[1][5]-E22) * (2*knn[1][1]*t3+knn[1][2]*t2+knn[1][4])
 			     +(knn[2][0]*t1*t1+knn[2][1]*t3*t3+knn[2][2]*t1*t3+knn[2][3]*t1+knn[2][4]*t3+knn[2][5]-E32) * (2*knn[2][1]*t3+knn[2][2]*t1+knn[2][4])
 			     +(knn[5][0]*t3*t3+knn[5][1]*t4*t4+knn[5][2]*t3*t4+knn[5][3]*t3+knn[5][4]*t4+knn[5][5]-E62) * (2*knn[5][0]*t3+knn[5][2]*t4+knn[5][3])
-				 /*+8.5f*( (a1*t1-a2*t2+pt0[0].x-pt0[1].x)*(a3*t3-a2*t2+pt0[2].x-pt0[1].x) + (b1*t1-b2*t2+pt0[0].y-pt0[1].y)*(b3*t3-b2*t2+pt0[2].y-pt0[1].y) + (c1*t1-c2*t2+pt0[0].z-pt0[1].z)*(c3*t3-c2*t2+pt0[2].z-pt0[1].z) )
+				/* +0.2f*( (a1*t1-a2*t2+pt0[0].x-pt0[1].x)*(a3*t3-a2*t2+pt0[2].x-pt0[1].x) + (b1*t1-b2*t2+pt0[0].y-pt0[1].y)*(b3*t3-b2*t2+pt0[2].y-pt0[1].y) + (c1*t1-c2*t2+pt0[0].z-pt0[1].z)*(c3*t3-c2*t2+pt0[2].z-pt0[1].z) )
 				                  *(  (a1*t1-a2*t2+pt0[0].x-pt0[1].x)*(a3) 
 				                    + (b1*t1-b2*t2+pt0[0].y-pt0[1].y)*(b3) 
 				                    + (c1*t1-c2*t2+pt0[0].z-pt0[1].z)*(c3) )*/
@@ -1342,6 +1353,14 @@ void GL_Build_Steepest_M4Point(int *ID_Pt,float*ID_Length,float tN_GlobalS_4N[][
 		 tN_GlobalS_4N[numc][2]=t3;
 		 tN_GlobalS_4N[numc][3]=t4;
 
+		 Energy_GlobalN[numc]=(knn[0][0]*t1*t1+knn[0][1]*t2*t2+knn[0][2]*t1*t2+knn[0][3]*t1+knn[0][4]*t2+knn[0][5]-E12)*(knn[0][0]*t1*t1+knn[0][1]*t2*t2+knn[0][2]*t1*t2+knn[0][3]*t1+knn[0][4]*t2+knn[0][5]-E12)
+			             +(knn[1][0]*t2*t2+knn[1][1]*t3*t3+knn[1][2]*t2*t3+knn[1][3]*t2+knn[1][4]*t3+knn[1][5]-E22)*(knn[1][0]*t2*t2+knn[1][1]*t3*t3+knn[1][2]*t2*t3+knn[1][3]*t2+knn[1][4]*t3+knn[1][5]-E22)
+			             +(knn[2][0]*t1*t1+knn[2][1]*t3*t3+knn[2][2]*t1*t3+knn[2][3]*t1+knn[2][4]*t3+knn[2][5]-E32)*(knn[2][0]*t1*t1+knn[2][1]*t3*t3+knn[2][2]*t1*t3+knn[2][3]*t1+knn[2][4]*t3+knn[2][5]-E32)
+
+			             +(knn[3][0]*t1*t1+knn[3][1]*t4*t4+knn[3][2]*t1*t4+knn[3][3]*t1+knn[3][4]*t4+knn[3][5]-E42)*(knn[3][0]*t1*t1+knn[3][1]*t4*t4+knn[3][2]*t1*t4+knn[3][3]*t1+knn[3][4]*t4+knn[3][5]-E42)
+			             +(knn[4][0]*t2*t2+knn[4][1]*t4*t4+knn[4][2]*t2*t4+knn[4][3]*t2+knn[4][4]*t4+knn[4][5]-E52)*(knn[4][0]*t2*t2+knn[4][1]*t4*t4+knn[4][2]*t2*t4+knn[4][3]*t2+knn[4][4]*t4+knn[4][5]-E52)
+			             +(knn[5][0]*t3*t3+knn[5][1]*t4*t4+knn[5][2]*t3*t4+knn[5][3]*t3+knn[5][4]*t4+knn[5][5]-E62)*(knn[5][0]*t3*t3+knn[5][1]*t4*t4+knn[5][2]*t3*t4+knn[5][3]*t3+knn[5][4]*t4+knn[5][5]-E62)
+						 ;
 		  //---------------------------------------------------
 }
 
@@ -1352,6 +1371,32 @@ void GL_Build_Steepest_M4Point(int *ID_Pt,float*ID_Length,float tN_GlobalS_4N[][
 void GL_Build_Steepest_M5Point(int &Point_Check,int &DiguCnt,int &DiguNum )
 {
 	
+}
+
+/************************************************************************/
+float GL_Distance2(GL_Point pt1,GL_Point pt2)
+{
+	float dst=(pt1.x-pt2.x)*(pt1.x-pt2.x) + (pt1.y-pt2.y)*(pt1.y-pt2.y) + (pt1.z-pt2.z);
+	return dst;
+}
+/************************************************************************/
+// ID_Length: 对应的ID点之间长度：
+//            对应规则：// 1->2
+//						   2->3
+//						   1->3
+//						   1->4
+//						   2->4
+//						   3->4
+void GL_Got_Length(int *ID_PtN,float *ID_LengthN)
+{
+	ID_LengthN[0]=GL_Distance2(HeadPlay_PtB[ID_PtN[0]],HeadPlay_PtB[ID_PtN[1]]);
+	ID_LengthN[1]=GL_Distance2(HeadPlay_PtB[ID_PtN[1]],HeadPlay_PtB[ID_PtN[2]]);
+	ID_LengthN[2]=GL_Distance2(HeadPlay_PtB[ID_PtN[0]],HeadPlay_PtB[ID_PtN[2]]);
+
+	ID_LengthN[3]=GL_Distance2(HeadPlay_PtB[ID_PtN[0]],HeadPlay_PtB[ID_PtN[3]]);
+	ID_LengthN[4]=GL_Distance2(HeadPlay_PtB[ID_PtN[1]],HeadPlay_PtB[ID_PtN[3]]);
+	ID_LengthN[5]=GL_Distance2(HeadPlay_PtB[ID_PtN[2]],HeadPlay_PtB[ID_PtN[3]]);
+
 }
 /***************************** 计算能量函数 *****************************/
 void GL_Energy()
@@ -1438,20 +1483,35 @@ void GL_Energy()
 
 		 //---------------迭代模式选择
 		 Point_Check=4;
+		 //
+
+		 int ID_Pt1[4]={0,4,5,6};
+		 int ID_Pt2[4]={0,4,5,1};
+
+		 float ID_Length1[6];
+		 float ID_Length2[6];
+
+		 GL_Got_Length(ID_Pt1,ID_Length1);
+		 GL_Got_Length(ID_Pt2,ID_Length2);
 		 //-------------------------------------------------------------------------------------------递归算法 Start
 		 //GL_Build_Steepest_M(Point_Check,DiguCnt,DiguNum );
 		 //4点拟合
 		 if(Point_Check==4)
 		 {
-			 int ID_Pt[4]={0,4,5,6};
-			 float ID_Length[6]={16,16,32,32,16,64};
 			 int numc=0;//四点拟合组数选择
-			 GL_Build_Steepest_M4Point(ID_Pt,ID_Length, tN_GlobalS_4,numc,Point_Check,DiguCnt,DiguNum );
+
+			 GL_Build_Steepest_M4Point(ID_Pt1,ID_Length1, tN_GlobalS_4,Energy_Global,numc,Point_Check,DiguCnt,DiguNum );
+
+			 numc=1;//四点拟合组数选择
+
+			 GL_Build_Steepest_M4Point(ID_Pt2,ID_Length2, tN_GlobalS_4,Energy_Global,numc,Point_Check,DiguCnt,DiguNum );
+
 			 //返回用于打印显示
-			 t1_Global=tN_GlobalS_4[0][0];
-			 t2_Global=tN_GlobalS_4[0][1];
-			 t3_Global=tN_GlobalS_4[0][2];
-			 t4_Global=tN_GlobalS_4[0][3];
+			 numc=0;
+			 t1_Global=tN_GlobalS_4[numc][0];
+			 t2_Global=tN_GlobalS_4[numc][1];
+			 t3_Global=tN_GlobalS_4[numc][2];
+			 t4_Global=tN_GlobalS_4[numc][3];
 		 }
 		 
 		 //5点拟合
@@ -1521,84 +1581,46 @@ void GL_Energy()
 			Cnt_Err++;
 		}
 
-		printf("4.5*4.5空间 >>> 达标与不达标个数： ( %d , %d )\n",Cnt_Correct,Cnt_Err);
-
-		printf("\n&&&---------------------------------\n");
-		printf("3*3空间 单位：每厘米 为 0.6 \n");
-		if(abs(xp0-x1)<2.5 && abs(yp0-y1)<2.5 && abs(zp0-z1)<2.5)
-		{
-			Cnt_Correct3++;
-		}
-		else
-		{
-			Cnt_Err3++;
-		}
-		printf("  3*3  空间 >>> 达标与不达标个数： ( %d , %d )\n",Cnt_Correct3,Cnt_Err3);
-
-		if(abs(xp0-x1)<6.4 && abs(yp0-y1)<6.4 && abs(zp0-z1)<6.4)
-		{
-			Cnt_Correct12++;
-		}
-		else
-		{
-			Cnt_Err12++;
-		}
-		printf("4.5*4.5空间(16cm 界限) >>> 达标与不达标个数： ( %d , %d )\n",Cnt_Correct12,Cnt_Err12);
+		printf("4.5*4.5空间 >>> （ 5cm范围 ）达标与不达标个数： ( %d , %d )\n",Cnt_Correct,Cnt_Err);
+		
 		//------------------------------------
 		//多点显示
-		float x_ture[5],y_ture[5],z_ture[5];//真实
-		float x_etm[5],y_etm[5],z_etm[5];//估计
+		float x_ture1[5],y_ture1[5],z_ture1[5];//真实
+		float x_etm1[5],y_etm1[5],z_etm1[5];//估计
+		float x_ture2[5],y_ture2[5],z_ture2[5];//真实
+		float x_etm2[5],y_etm2[5],z_etm2[5];//估计
 
-		x_etm[0]=LineRays[0].x*t1_Global+LineRays[0].pt0.x;
-		y_etm[0]=LineRays[0].y*t1_Global+LineRays[0].pt0.y;
-		z_etm[0]=LineRays[0].z*t1_Global+LineRays[0].pt0.z;
-
-		x_etm[1]=LineRays[4].x*t2_Global+LineRays[4].pt0.x;
-		y_etm[1]=LineRays[4].y*t2_Global+LineRays[4].pt0.y;
-		z_etm[1]=LineRays[4].z*t2_Global+LineRays[4].pt0.z;
-
-		x_etm[2]=LineRays[5].x*t3_Global+LineRays[5].pt0.x;
-		y_etm[2]=LineRays[5].y*t3_Global+LineRays[5].pt0.y;
-		z_etm[2]=LineRays[5].z*t3_Global+LineRays[5].pt0.z;
-
-		x_etm[3]=LineRays[6].x*t4_Global+LineRays[6].pt0.x;
-		y_etm[3]=LineRays[6].y*t4_Global+LineRays[6].pt0.y;
-		z_etm[3]=LineRays[6].z*t4_Global+LineRays[6].pt0.z;
-
-		x_etm[4]=LineRays[1].x*t5_Global+LineRays[1].pt0.x;
-		y_etm[4]=LineRays[1].y*t5_Global+LineRays[1].pt0.y;
-		z_etm[4]=LineRays[1].z*t5_Global+LineRays[1].pt0.z;
-		//---------------------------------
-		x_ture[0]=HeadPlay_Pt[0].x;
-		y_ture[0]=HeadPlay_Pt[0].y;
-		z_ture[0]=HeadPlay_Pt[0].z;
-
-		x_ture[1]=HeadPlay_Pt[4].x;
-		y_ture[1]=HeadPlay_Pt[4].y;
-		z_ture[1]=HeadPlay_Pt[4].z;
-
-		x_ture[2]=HeadPlay_Pt[5].x;
-		y_ture[2]=HeadPlay_Pt[5].y;
-		z_ture[2]=HeadPlay_Pt[5].z;
-
-		x_ture[3]=HeadPlay_Pt[6].x;
-		y_ture[3]=HeadPlay_Pt[6].y;
-		z_ture[3]=HeadPlay_Pt[6].z;
-
-		x_ture[4]=HeadPlay_Pt[1].x;
-		y_ture[4]=HeadPlay_Pt[1].y;
-		z_ture[4]=HeadPlay_Pt[1].z;
-		//-----------------------------
-		printf("-------------------------- 冗余多点信息 ：\n");
-
-		FILE *file_Err=fopen(".//ErronPos.txt","a+");
-		
 		for(int i=0;i<Point_Check;i++)
 		{
-			printf(" %d) 真实值：(%f,%f,%f) \n",i+1,x_ture[i],y_ture[i],z_ture[i]);
-			printf("     估计值：(%f,%f,%f) \n",    x_etm[i],y_etm[i],z_etm[i]);
-			printf("     误差值：(%f,%f,%f) \n",ABS(x_ture[i]-x_etm[i]),ABS(y_ture[i]-y_etm[i]),ABS(z_ture[i]-z_etm[i]) );
-			if( ABS(x_ture[i]-x_etm[i])<1.0f && ABS(y_ture[i]-y_etm[i])<1.0f && ABS(z_ture[i]-z_etm[i])<1.0f )
+			//获取估计值
+			x_etm1[i]=LineRays[ID_Pt1[i]].x*tN_GlobalS_4[0][i]+LineRays[ID_Pt1[i]].pt0.x;
+			y_etm1[i]=LineRays[ID_Pt1[i]].y*tN_GlobalS_4[0][i]+LineRays[ID_Pt1[i]].pt0.y;
+			z_etm1[i]=LineRays[ID_Pt1[i]].z*tN_GlobalS_4[0][i]+LineRays[ID_Pt1[i]].pt0.z;
+			//
+			x_etm2[i]=LineRays[ID_Pt2[i]].x*tN_GlobalS_4[1][i]+LineRays[ID_Pt2[i]].pt0.x;
+			y_etm2[i]=LineRays[ID_Pt2[i]].y*tN_GlobalS_4[1][i]+LineRays[ID_Pt2[i]].pt0.y;
+			z_etm2[i]=LineRays[ID_Pt2[i]].z*tN_GlobalS_4[1][i]+LineRays[ID_Pt2[i]].pt0.z;
+			//获取真实值
+			x_ture1[i]=HeadPlay_Pt[ID_Pt1[i]].x;
+			y_ture1[i]=HeadPlay_Pt[ID_Pt1[i]].y;
+			z_ture1[i]=HeadPlay_Pt[ID_Pt1[i]].z;
+			//
+			x_ture2[i]=HeadPlay_Pt[ID_Pt2[i]].x;
+			y_ture2[i]=HeadPlay_Pt[ID_Pt2[i]].y;
+			z_ture2[i]=HeadPlay_Pt[ID_Pt2[i]].z;
+		}
+	
+		//-----------------------------
+		printf("-------------------------- 冗余多点信息 ：\n");
+		printf("---------------------- Point 1 ----------------------\n");
+		FILE *file_Err=fopen(".//ErronPos.txt","a+");
+		//-------------------------------------- 1
+		for(int i=0;i<Point_Check;i++)
+		{
+			printf(" %d) 真实值：(%f,%f,%f) \n",i+1,x_ture1[i],y_ture1[i],z_ture1[i]);
+			printf("     估计值：(%f,%f,%f) \n",    x_etm1[i],y_etm1[i],z_etm1[i]);
+			printf("     误差值：(%f,%f,%f) \n",ABS(x_ture1[i]-x_etm1[i]),ABS(y_ture1[i]-y_etm1[i]),ABS(z_ture1[i]-z_etm1[i]) );
+			if( ABS(x_ture1[i]-x_etm1[i])<1.0f && ABS(y_ture1[i]-y_etm1[i])<1.0f && ABS(z_ture1[i]-z_etm1[i])<1.0f )
 			{
 				printf("------------------------------->> Success !!!\n");
 				Right_CntBest++;
@@ -1615,14 +1637,37 @@ void GL_Energy()
 				fprintf(file_Err,"CPU递归时间 ： %f \n",timex);
 				fprintf(file_Err,"目标到扫描原点距离：%f\n",dst_print);
 				fprintf(file_Err,"%d) 错误情况: 点ID:%d\n",Erron_CntBest,i+1);
-				fprintf(file_Err,"    真实值：(%f,%f,%f)\n",x_ture[i],y_ture[i],z_ture[i]);
-				fprintf(file_Err,"    估计值：(%f,%f,%f)\n",x_etm[i],y_etm[i],z_etm[i]);
-				fprintf(file_Err,"    误差值：(%f,%f,%f)\n",ABS(x_ture[i]-x_etm[i]),ABS(y_ture[i]-y_etm[i]),ABS(z_ture[i]-z_etm[i]));
+				fprintf(file_Err,"    真实值：(%f,%f,%f)\n",x_ture1[i],y_ture1[i],z_ture1[i]);
+				fprintf(file_Err,"    估计值：(%f,%f,%f)\n",x_etm1[i],y_etm1[i],z_etm1[i]);
+				fprintf(file_Err,"    误差值：(%f,%f,%f)\n",ABS(x_ture1[i]-x_etm1[i]),ABS(y_ture1[i]-y_etm1[i]),ABS(z_ture1[i]-z_etm1[i]));
 				fprintf(file_Err,"    PRY姿态角：(%d,%d,%d)\n",Pitch_angle,Rool_angle,Yaw_angle);
 			}
 		}
 		fclose(file_Err);
+		printf("---------------------- Point 2 ----------------------\n");
+		//------------------------------------ 2
+		for(int i=0;i<Point_Check;i++)
+		{
+			printf(" %d) 真实值：(%f,%f,%f) \n",i+1,x_ture2[i],y_ture2[i],z_ture2[i]);
+			printf("     估计值：(%f,%f,%f) \n",    x_etm2[i],y_etm2[i],z_etm2[i]);
+			printf("     误差值：(%f,%f,%f) \n",ABS(x_ture2[i]-x_etm2[i]),ABS(y_ture2[i]-y_etm2[i]),ABS(z_ture2[i]-z_etm2[i]) );
+			if( ABS(x_ture2[i]-x_etm2[i])<1.0f && ABS(y_ture2[i]-y_etm2[i])<1.0f && ABS(z_ture2[i]-z_etm2[i])<1.0f )
+			{
+				printf("------------------------------->> Success !!!\n");
+				Right_CntBest++;
+			}
+			else
+			{
+				printf("------------------------------->> Erron   !!!………………\n");
+				Erron_CntBest++;
 
+			}
+		}
+		//显示能量值
+		for(int i=0;i<2;i++)
+		{
+			printf( "%d) 能量值 ： %f\n",i+1,Energy_Global[i]);
+		}
 		printf("@::::::::::::::::::  (2.5cm以内)最优错误计数 ： %d\n",Erron_CntBest);
 		printf("@!!!!!!!!!!!!!!!!!!  (2.5cm以内)最优正确计数 ： %d\n",Right_CntBest);
 		//---------------------
