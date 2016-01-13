@@ -16,7 +16,15 @@ float Edge_HW_z = 0.0f;
 //Motor 纵向 运动
 float Edge_ZW_x =-88.0f;
 float Edge_ZW_y = 83.0f;
-float Edge_ZW_z = 0.0f;
+<<<<<<< HEAD
+float Edge_ZW_z = -10.4f;
+
+//float Edge_ZW_x =-90.0f;
+//float Edge_ZW_y = 81.0f;
+//float Edge_ZW_z = -0.0f;
+=======
+float Edge_ZW_z = -1.2f;
+>>>>>>> origin/Branch-B
 
 int rot_gl_look=0;
 
@@ -95,8 +103,10 @@ GL_Point GL_Sample_AvgPt; //采样缓存点 均值
 GL_Point GL_Sample_VarianzPt;//均方差
 
 int Erron_CntBest=0;//错误计数
-
+int Right_CntBest=0;//错误计数
 //-------------------------------------------------------- FPS Tracking Start
 bool Fps_Track_Start=0;
+
+float Step_nn_Global;
 
 #endif

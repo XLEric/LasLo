@@ -76,6 +76,14 @@ int main(int argc, char* argv[])
 	printf("\t~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ GL_Start!\n");
 	printf("\t~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ GL_Start!\n");
 	printf("\t~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ GL_Start!\n");
+
+	for(int i=0;i<6;i++)
+	{
+		for(int j=0;j<4;j++)
+		tN_GlobalS_4[i][j]=90;
+	}
+
+	//------------------------------------------------
 	cvWaitKey(100);
 	
 	glutInitDisplayMode (GLUT_DOUBLE | GLUT_RGB);
