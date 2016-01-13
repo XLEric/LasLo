@@ -16,15 +16,13 @@ float Edge_HW_z = 0.0f;
 //Motor ×ÝÏò ÔË¶¯
 float Edge_ZW_x =-88.0f;
 float Edge_ZW_y = 83.0f;
-<<<<<<< HEAD
 float Edge_ZW_z = -10.4f;
 
 //float Edge_ZW_x =-90.0f;
 //float Edge_ZW_y = 81.0f;
 //float Edge_ZW_z = -0.0f;
-=======
-float Edge_ZW_z = -1.2f;
->>>>>>> origin/Branch-B
+
+
 
 int rot_gl_look=0;
 

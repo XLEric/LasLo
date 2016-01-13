@@ -1123,30 +1123,18 @@ void GL_Build_Steepest_M4Point(int *ID_Pt,float*ID_Length,float tN_GlobalS_4N[][
 	float z=c1*t1;
 	float track_dst=GL_Distance(0,0,0,x,y,z);
 
-<<<<<<< HEAD
+
 	/**********************************************************/
 	//越靠近扫描点 步长越小 -->> 0.000218
 
 	float nn=0.00268531;// 递归步长 适中（不能太大也不能太小）。
-=======
-	float nn=0.001345;// 递归步长 适中（不能太大也不能太小）。
+
 
 	
-	if(track_dst<150)
-	{
-		 nn=0.000655;
-	}
-	if(track_dst<80)
-	{
-		nn=0.000923;
-	}
-
-	
-	if(!Fps_Track_Start)
-	{
-		nn=0.001957;
-	}
->>>>>>> origin/Branch-B
+	//if(!Fps_Track_Start)
+	//{
+	//	nn=0.001957;
+	//}
 
 	Fps_Track_Start=1;
 	//边长平方
@@ -1330,10 +1318,7 @@ void GL_Build_Steepest_M4Point(int *ID_Pt,float*ID_Length,float tN_GlobalS_4N[][
 			 t3b=t3-nn*Ft3;
 			 t4b=t4-nn*Ft4;
 
-<<<<<<< HEAD
-=======
-			 printf("(%f,%f,%f,%f)\n",Ft1,Ft2,Ft3,Ft4);
->>>>>>> origin/Branch-B
+
 			 if(Point_Check==4)
 			 {
 				 if(t1==t1b && t2==t2b && t3==t3b &&t4==t4b)// && (ABS(t1-t1b)<0.005 && ABS(t2-t2b)<0.005 && ABS(t3-t3b)<0.005 && ABS(t4-t4b)<0.005)) 
@@ -1709,11 +1694,9 @@ void GL_Draw_Track_Point()
 
 		glPushMatrix();//储存当前视图矩阵
 		glLineWidth(1); 
-<<<<<<< HEAD
+
 		glColor3f(0.1,0.0,0.98); 
-=======
-		glColor3f(0.1,0.02,0.98); 
->>>>>>> origin/Branch-B
+
 		glTranslatef(x2,y2,z2);
 		glutSolidSphere(0.9, 20, 20);
 		glPopMatrix();//弹出上次保存的位置
@@ -1782,11 +1765,9 @@ void display(void)
 	GL_Draw_Filed();
 	//printf("-------------------- step1.2\n");
 	//GL_Scan(0.0091);
-<<<<<<< HEAD
+
 	GL_Scan(0.0251f);
-=======
-	GL_Scan(0.0231);
->>>>>>> origin/Branch-B
+
 	//printf("-------------------- step1.3\n");
 	GLB_IMU(gxr_Global,gyr_Global, gzr_Global,1 ) ;
 	gxr_Global=0;
