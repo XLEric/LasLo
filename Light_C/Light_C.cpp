@@ -80,7 +80,15 @@ int main(int argc, char* argv[])
 	for(int i=0;i<6;i++)
 	{
 		for(int j=0;j<4;j++)
-		tN_GlobalS_4[i][j]=90;
+		{
+			tN_GlobalS_4A[i][j]=90;
+			tN_GlobalS_4B[i][j]=90;
+		}
+		if(i==1)
+		tStep_nn_G[i]=0.00268531;
+		else
+		tStep_nn_G[i]=0.00308531;
+		
 	}
 
 	//------------------------------------------------

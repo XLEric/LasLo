@@ -53,9 +53,11 @@ bool Best_Flag=0;//一帧显示一次最优拟合标志
 //-------------------------------------------------------------------------------
 float t1_Global=190,t2_Global=190,t3_Global=190,t4_Global=190,t5_Global=190;
 
-float tN_GlobalS_4[6][4];//6组 4点建模 迭代寄存器
-float Energy_Global[6];
-
+float tN_GlobalS_4A[6][4];//6组 4点建模 迭代寄存器
+float tN_GlobalS_4B[6][4];//6组 4点建模 迭代寄存器
+float Energy_GlobalA[6];
+float Energy_GlobalB[6];
+float tStep_nn_G[6];
 
 IplImage *frame_GL=cvCreateImage(cvSize(800,400),IPL_DEPTH_8U, 3);
 
@@ -1101,8 +1103,13 @@ void GLB_Knn2(float Knn[][6],float a1,float b1,float c1,GL_Vector pt1,float a2,f
 	//	 float E62=64;// 3->4
 // tN_GlobalS_4N：四点拟合二维数组
 // numc:四点拟合的组数
-void GL_Build_Steepest_M4Point(int *ID_Pt,float*ID_Length,float tN_GlobalS_4N[][4],float* Energy_GlobalN,int numc,
-	                     int &Point_Check,int &DiguCnt,int &DiguNum )
+
+//tN_GlobalS_4N :为射线的变量，因为模型有四条射线所以数组为[][4].
+//Energy_GlobalN:能量函数 （分为：Energy_GlobalA 和 Energy_GlobalB，用于能量比较，从而改变迭代步长tStep_nn_GX）。
+//tStep_nn_GX   :迭代算法步长。
+//Flag_Step     :为1时迭代步长加 STEPNN，为0时迭代步长减 STEPNN。
+void GL_Build_Steepest_M4Point(int *ID_Pt,float*ID_Length,float tN_GlobalS_4N[][4],float* Energy_GlobalN,float *tStep_nn_GX,int numc,
+	                     int &Point_Check,int &DiguCnt,int &DiguNum,bool Flag_Step )
 {
 	//当多组合时，DiguNum 与 DiguCnt必须清零。
 	DiguNum=0;
@@ -1140,8 +1147,6 @@ void GL_Build_Steepest_M4Point(int *ID_Pt,float*ID_Length,float tN_GlobalS_4N[][
 
 	float nn=0.00268531;// 递归步长 适中（不能太大也不能太小）。
 
-
-	
 	//if(!Fps_Track_Start)
 	//{
 	//	nn=0.001957;
@@ -1176,7 +1181,16 @@ void GL_Build_Steepest_M4Point(int *ID_Pt,float*ID_Length,float tN_GlobalS_4N[][
 	GLB_Knn2(knn,a1,b1,c1,pt0[0], a4,b4,c4,pt0[3], 3);
 	GLB_Knn2(knn,a2,b2,c2,pt0[1], a4,b4,c4,pt0[3], 4);
 	GLB_Knn2(knn,a3,b3,c3,pt0[2], a4,b4,c4,pt0[3], 5);
-	 nn=0.00298531;
+	// nn=0.00298531;
+
+	if(Flag_Step)
+	{
+		nn=tStep_nn_GX[numc]+STEPNN;
+	}
+	else if(!Flag_Step)
+	{
+		nn=tStep_nn_GX[numc]-STEPNN;
+	}
 #endif
 	 //if(track_dst>160.0f)
 	 //{
@@ -1187,7 +1201,7 @@ void GL_Build_Steepest_M4Point(int *ID_Pt,float*ID_Length,float tN_GlobalS_4N[][
 	 //{
 		// nn=0.00318531;
 	 //}
-	 Step_nn_Global=nn;
+	 //Step_nn_Global=nn;
 	// F(t1,t2,t3)=(knn[0][0]*t1*t1+knn[0][1]*t2*t2+knn[0][2]*t1*t2+knn[0][3]*t1+knn[0][4]*t2+knn[0][5]-E12)*(knn[0][0]*t1*t1+knn[0][1]*t2*t2+knn[0][2]*t1*t2+knn[0][3]*t1+knn[0][4]*t2+knn[0][5]-E12)
 	//            +(knn[1][0]*t2*t2+knn[1][1]*t3*t3+knn[1][2]*t2*t3+knn[1][3]*t2+knn[1][4]*t3+knn[1][5]-E22)*(knn[1][0]*t2*t2+knn[1][1]*t3*t3+knn[1][2]*t2*t3+knn[1][3]*t2+knn[1][4]*t3+knn[1][5]-E22)
 	//            +(knn[2][0]*t1*t1+knn[2][1]*t3*t3+knn[2][2]*t1*t3+knn[2][3]*t1+knn[2][4]*t3+knn[2][5]-E32)*(knn[2][0]*t1*t1+knn[2][1]*t3*t3+knn[2][2]*t1*t3+knn[2][3]*t1+knn[2][4]*t3+knn[2][5]-E32)
@@ -1398,6 +1412,40 @@ void GL_Got_Length(int *ID_PtN,float *ID_LengthN)
 	ID_LengthN[5]=GL_Distance2(HeadPlay_PtB[ID_PtN[2]],HeadPlay_PtB[ID_PtN[3]]);
 
 }
+
+/************************************* 自适应迭代递归步长过程 **********************************/
+// DiguNum : 记录递归算法小循环
+// DiguCnt : 记录递归算法大循环 N*65535
+// Point_Check ：模式选择：算法点数
+// ID_Pt：拟合的ID点号 （例子：0,4,5,6）
+// ID_Length: 对应的ID点之间长度：
+//            对应规则：// 1->2
+//						   2->3
+//						   1->3
+//						   1->4
+//						   2->4
+//						   3->4
+//例子：float E12=16;// 1->2
+//	 float E22=16;// 2->3
+//	 float E32=32;// 1->3
+//	 float E42=32;// 1->4
+//	 float E52=16;// 2->4
+//	 float E62=64;// 3->4
+
+// numc:四点拟合的组数
+void GL_Build_Steepest_M4Point_Process(int *ID_Pt,float*ID_Length,int numc,int &Point_Check,int &DiguCnt,int &DiguNum)
+{
+	GL_Build_Steepest_M4Point(ID_Pt,ID_Length, tN_GlobalS_4A,Energy_GlobalA,tStep_nn_G,numc,Point_Check,DiguCnt,DiguNum,1 );
+	//GL_Build_Steepest_M4Point(ID_Pt,ID_Length, tN_GlobalS_4B,Energy_GlobalB,tStep_nn_G,numc,Point_Check,DiguCnt,DiguNum,0 );
+	////if(Energy_GlobalA[numc]>Energy_GlobalB[numc])
+	////{
+	////	tStep_nn_G[numc]+=STEPNN;
+	////}
+	////else
+	////{
+	////	tStep_nn_G[numc]-=STEPNN;
+	////}
+}
 /***************************** 计算能量函数 *****************************/
 void GL_Energy()
 {
@@ -1484,10 +1532,10 @@ void GL_Energy()
 		 //---------------迭代模式选择
 		 Point_Check=4;
 		 //
-
+		 //建模用的头显 ID
 		 int ID_Pt1[4]={0,4,5,6};
 		 int ID_Pt2[4]={0,4,5,1};
-
+		 //建模用的头显 ID之间的长度平方
 		 float ID_Length1[6];
 		 float ID_Length2[6];
 
@@ -1500,18 +1548,37 @@ void GL_Energy()
 		 {
 			 int numc=0;//四点拟合组数选择
 
-			 GL_Build_Steepest_M4Point(ID_Pt1,ID_Length1, tN_GlobalS_4,Energy_Global,numc,Point_Check,DiguCnt,DiguNum );
+			 /*GL_Build_Steepest_M4Point(ID_Pt1,ID_Length1, tN_GlobalS_4A,Energy_GlobalA,tStep_nn_G,numc,Point_Check,DiguCnt,DiguNum,1 );
+			 GL_Build_Steepest_M4Point(ID_Pt1,ID_Length1, tN_GlobalS_4B,Energy_GlobalB,tStep_nn_G,numc,Point_Check,DiguCnt,DiguNum,0 );
+			 if(Energy_GlobalA[numc]>Energy_GlobalB[numc])
+			 {
+			 tStep_nn_G[numc]+=STEPNN;
+			 }
+			 else
+			 {
+			 tStep_nn_G[numc]-=STEPNN;
+			 }*/
 
+			 GL_Build_Steepest_M4Point_Process(ID_Pt1,ID_Length1,numc,Point_Check,DiguCnt,DiguNum);
 			 numc=1;//四点拟合组数选择
-
-			 GL_Build_Steepest_M4Point(ID_Pt2,ID_Length2, tN_GlobalS_4,Energy_Global,numc,Point_Check,DiguCnt,DiguNum );
+			 GL_Build_Steepest_M4Point_Process(ID_Pt2,ID_Length2,numc,Point_Check,DiguCnt,DiguNum);
+			/* GL_Build_Steepest_M4Point(ID_Pt2,ID_Length2, tN_GlobalS_4A,Energy_GlobalA,tStep_nn_G,numc,Point_Check,DiguCnt,DiguNum,1 );
+			 GL_Build_Steepest_M4Point(ID_Pt2,ID_Length2, tN_GlobalS_4B,Energy_GlobalB,tStep_nn_G,numc,Point_Check,DiguCnt,DiguNum,0 );
+			 if(Energy_GlobalA[numc]>Energy_GlobalB[numc])
+			 {
+				 tStep_nn_G[numc]+=STEPNN;
+			 }
+			 else
+			 {
+				 tStep_nn_G[numc]-=STEPNN;
+			 }*/
 
 			 //返回用于打印显示
 			 numc=0;
-			 t1_Global=tN_GlobalS_4[numc][0];
-			 t2_Global=tN_GlobalS_4[numc][1];
-			 t3_Global=tN_GlobalS_4[numc][2];
-			 t4_Global=tN_GlobalS_4[numc][3];
+			 t1_Global=tN_GlobalS_4A[numc][0];
+			 t2_Global=tN_GlobalS_4A[numc][1];
+			 t3_Global=tN_GlobalS_4A[numc][2];
+			 t4_Global=tN_GlobalS_4A[numc][3];
 		 }
 		 
 		 //5点拟合
@@ -1530,7 +1597,11 @@ void GL_Energy()
 		 printf("                             <<< 第 %d 帧 >>>\n",Fps_World);
 		 printf("递归次数：%d*65535 + %d \n",DiguCnt-1,DiguNum);
 		 printf("CPU递归时间 ： %f \n",timex);
-		 printf("递归步长： %f \n",Step_nn_Global);
+		 for(int i=0;i<2;i++)
+		 {
+			 printf(" %d) 递归步长： %f \n",i+1,tStep_nn_G[i]);
+		 }
+		 
 		 //------------------------
 		 float xx=LineRays[0].x*t1_Global+LineRays[0].pt0.x;
 		 float yy=LineRays[0].y*t1_Global+LineRays[0].pt0.y;
@@ -1593,13 +1664,13 @@ void GL_Energy()
 		for(int i=0;i<Point_Check;i++)
 		{
 			//获取估计值
-			x_etm1[i]=LineRays[ID_Pt1[i]].x*tN_GlobalS_4[0][i]+LineRays[ID_Pt1[i]].pt0.x;
-			y_etm1[i]=LineRays[ID_Pt1[i]].y*tN_GlobalS_4[0][i]+LineRays[ID_Pt1[i]].pt0.y;
-			z_etm1[i]=LineRays[ID_Pt1[i]].z*tN_GlobalS_4[0][i]+LineRays[ID_Pt1[i]].pt0.z;
+			x_etm1[i]=LineRays[ID_Pt1[i]].x*tN_GlobalS_4A[0][i]+LineRays[ID_Pt1[i]].pt0.x;
+			y_etm1[i]=LineRays[ID_Pt1[i]].y*tN_GlobalS_4A[0][i]+LineRays[ID_Pt1[i]].pt0.y;
+			z_etm1[i]=LineRays[ID_Pt1[i]].z*tN_GlobalS_4A[0][i]+LineRays[ID_Pt1[i]].pt0.z;
 			//
-			x_etm2[i]=LineRays[ID_Pt2[i]].x*tN_GlobalS_4[1][i]+LineRays[ID_Pt2[i]].pt0.x;
-			y_etm2[i]=LineRays[ID_Pt2[i]].y*tN_GlobalS_4[1][i]+LineRays[ID_Pt2[i]].pt0.y;
-			z_etm2[i]=LineRays[ID_Pt2[i]].z*tN_GlobalS_4[1][i]+LineRays[ID_Pt2[i]].pt0.z;
+			x_etm2[i]=LineRays[ID_Pt2[i]].x*tN_GlobalS_4A[1][i]+LineRays[ID_Pt2[i]].pt0.x;
+			y_etm2[i]=LineRays[ID_Pt2[i]].y*tN_GlobalS_4A[1][i]+LineRays[ID_Pt2[i]].pt0.y;
+			z_etm2[i]=LineRays[ID_Pt2[i]].z*tN_GlobalS_4A[1][i]+LineRays[ID_Pt2[i]].pt0.z;
 			//获取真实值
 			x_ture1[i]=HeadPlay_Pt[ID_Pt1[i]].x;
 			y_ture1[i]=HeadPlay_Pt[ID_Pt1[i]].y;
@@ -1666,7 +1737,7 @@ void GL_Energy()
 		//显示能量值
 		for(int i=0;i<2;i++)
 		{
-			printf( "%d) 能量值 ： %f\n",i+1,Energy_Global[i]);
+			printf( "%d) 能量值 ： %f\n",i+1,Energy_GlobalA[i]);
 		}
 		printf("@::::::::::::::::::  (2.5cm以内)最优错误计数 ： %d\n",Erron_CntBest);
 		printf("@!!!!!!!!!!!!!!!!!!  (2.5cm以内)最优正确计数 ： %d\n",Right_CntBest);
@@ -1811,7 +1882,7 @@ void display(void)
 	//printf("-------------------- step1.2\n");
 	//GL_Scan(0.0091);
 
-	GL_Scan(0.0251f);
+	GL_Scan(0.0171f);
 
 	//printf("-------------------- step1.3\n");
 	GLB_IMU(gxr_Global,gyr_Global, gzr_Global,1 ) ;
