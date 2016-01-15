@@ -11,6 +11,7 @@
 #include <math.h>
 
 #define STEPNN 0.000051f
+#define Scan_Step 0.0171f //横纵 Motor的运动步长
 
 //Motor 横向 运动
 float Edge_HW_x = -90.0f;
@@ -19,7 +20,7 @@ float Edge_HW_z = 0.0f;
 //Motor 纵向 运动
 float Edge_ZW_x =-88.0f;
 float Edge_ZW_y = 83.0f;
-float Edge_ZW_z = -0.1f;
+float Edge_ZW_z = -0.0f;
 
 //float Edge_ZW_x =-90.0f;
 //float Edge_ZW_y = 81.0f;

@@ -1141,16 +1141,19 @@ void GL_Build_Steepest_M4Point(int *ID_Pt,float*ID_Length,float tN_GlobalS_4N[][
 	float z=c1*t1;
 	float track_dst=GL_Distance(0,0,0,x,y,z);
 
-
 	/**********************************************************/
 	//越靠近扫描点 步长越小 -->> 0.000218
 
-	float nn=0.00268531;// 递归步长 适中（不能太大也不能太小）。
+	float nn=0.002515;// 递归步长 适中（不能太大也不能太小）。
+	if(track_dst<160)
+	{
+		nn=0.001815;
+	}
 
-	//if(!Fps_Track_Start)
-	//{
-	//	nn=0.001957;
-	//}
+	if(!Fps_Track_Start)
+	{
+		nn=0.001815;
+	}
 
 	Fps_Track_Start=1;
 	//边长平方
@@ -1183,14 +1186,14 @@ void GL_Build_Steepest_M4Point(int *ID_Pt,float*ID_Length,float tN_GlobalS_4N[][
 	GLB_Knn2(knn,a3,b3,c3,pt0[2], a4,b4,c4,pt0[3], 5);
 	// nn=0.00298531;
 
-	if(Flag_Step)
-	{
-		nn=tStep_nn_GX[numc]+STEPNN;
-	}
-	else if(!Flag_Step)
-	{
-		nn=tStep_nn_GX[numc]-STEPNN;
-	}
+	//if(Flag_Step)
+	//{
+	//	nn=tStep_nn_GX[numc]+STEPNN;
+	//}
+	//else if(!Flag_Step)
+	//{
+	//	nn=tStep_nn_GX[numc]-STEPNN;
+	//}
 #endif
 	 //if(track_dst>160.0f)
 	 //{
@@ -1882,7 +1885,7 @@ void display(void)
 	//printf("-------------------- step1.2\n");
 	//GL_Scan(0.0091);
 
-	GL_Scan(0.0171f);
+	GL_Scan(Scan_Step);
 
 	//printf("-------------------- step1.3\n");
 	GLB_IMU(gxr_Global,gyr_Global, gzr_Global,1 ) ;

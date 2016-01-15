@@ -31,7 +31,7 @@ GL_Line GLB_Line(float ax,float ay,float az,float Da,float bx,float by,float bz,
 		v.x=N_X/norm;
 		v.y=N_Y/norm;
 		v.z=N_Z/norm;
-
+#if 0
 		if((ax*by-ay*bx)!=0)
 		{
 			v.pt0.x=(ay*Db-by*Da)/(ax*by-ay*bx);
@@ -52,7 +52,11 @@ GL_Line GLB_Line(float ax,float ay,float az,float Da,float bx,float by,float bz,
 		}
 	
 		v.pt0.z=0;
-
+#else
+		v.pt0.x=Edge_HW_x;
+		v.pt0.y=Edge_ZW_y;
+		v.pt0.z=0;
+#endif
 		return v;
 	}
 
